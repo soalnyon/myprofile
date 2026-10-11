@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { CameraControls, Environment, Lightformer, Sparkles, useProgress } from '@react-three/drei';
 import { EffectComposer, HueSaturation, Bloom } from '@react-three/postprocessing';
 import { Model as ItemA } from './ItemA'; 
+import ConstellationSky from './ConstellationSky';
 import './index.css';
 
 
@@ -12,10 +13,10 @@ import './index.css';
 const VIEW_CONFIG = {
   overview: { position: [2, 5, 8], target: [0, -2, 0] },
   thebar: { position: [3, 0, 3], target: [2, -1, 0] },
-  boat: { position: [5, 0, 4], target: [2, -2, 0] },
+  boat: { position: [5.5, 1, 3], target: [3.9, -2.1, 1.15] },
   observatory: { position: [2, 2, 3], target: [2, 0, -1] },
   beach: { position: [1.1, -1, 3], target: [0, -1.5, 0] },
-  greenery: { position: [-1, 1, 2], target: [2, 0, -1] }
+  greenery: { position: [-1, 3, 1.5], target: [0, 1, 0] }
 };
 const MODEL_POSITION = [2, -3, 0];
 
@@ -90,6 +91,7 @@ function SceneLighting({ isDay }) {
 // ==========================================
 function App() {
   const [showPostcard, setShowPostcard] = useState(false);
+  const [showStars, setShowStars] = useState(false);
 const [time, setTime] = useState(new Date());
 const [isMuted, setIsMuted] = useState(true);
 const [isDay, setIsDay] = useState(true);
@@ -166,6 +168,7 @@ const [isDay, setIsDay] = useState(true);
               currentView={currentView} 
               setCurrentView={setCurrentView}
               setShowPostcard={setShowPostcard} // 新增这行
+              setShowStars={setShowStars}
               isDay={isDay}
               onReady={handleModelReady}
             />
@@ -275,38 +278,29 @@ const [isDay, setIsDay] = useState(true);
             {navExpanded ? '✕' : '◇'}
           </button>
 
-          {showPostcard && (
-            <div style={{
-              position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh',
-              background: 'rgba(0,0,0,0.8)', zIndex: 9999, display: 'flex', 
-              justifyContent: 'center', alignItems: 'center', pointerEvents: 'auto',
-              backdropFilter: 'blur(5px)'
-            }} onClick={() => setShowPostcard(false)}>
-              {/* 图片容器，阻止冒泡防止点击图片时也关闭弹窗 */}
-              <div style={{ position: 'relative' }} onClick={(e) => e.stopPropagation()}>
-                {/* src 换成你之后准备好的图片路径 */}
-                <img src="/postcard-image.png" alt="Postcard Detail" style={{ 
-                  maxWidth: '80vw', maxHeight: '80vh', borderRadius: '8px', 
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.5)' 
-                }} />
-                <button onClick={() => setShowPostcard(false)} style={{
-                  position: 'absolute', top: '-15px', right: '-15px',
-                  width: '32px', height: '32px', borderRadius: '50%',
-                  border: 'none', background: '#fff', color: '#333',
-                  cursor: 'pointer', fontWeight: 'bold', fontSize: '16px'
-                }}>
-                  ✕
-                </button>
-              </div>
-            </div>
-          )}
-
-
-
-
         </div>
         
       </div>
+      {showPostcard && (
+        <div className="postcard-overlay" role="presentation" onClick={() => setShowPostcard(false)}>
+          <article className="postcard-sheet" role="dialog" aria-modal="true" aria-label="A postcard from the coast"
+            onClick={event => event.stopPropagation()}>
+            <button type="button" className="postcard-close" aria-label="Close postcard"
+              onClick={() => setShowPostcard(false)}>×</button>
+            <div className="postcard-stamp" aria-hidden="true">COAST<br />& STARS</div>
+            <p className="postcard-kicker">A NOTE FROM THE SHORE</p>
+            <h2>Where the tide remembers</h2>
+            <p className="postcard-poem">
+              The sea folds gold into the sand,<br />
+              A quiet light upon my hand.<br />
+              The palms lean close, the blue waves roam,<br />
+              And every little breeze says home.
+            </p>
+            <div className="postcard-signature">From the coast, with love.</div>
+          </article>
+        </div>
+      )}
+      {showStars && <ConstellationSky onClose={() => setShowStars(false)} />}
       {transition && (
         <div className={`scene-transition ${transition.type === 'theme' ? `scene-transition-${transition.target}` : 'scene-transition-day'}`}
           role="status" aria-label={transition.type === 'load' ? 'Loading coastal scene' : 'Changing time of day'}>
