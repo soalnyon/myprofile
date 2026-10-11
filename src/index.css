@@ -38,7 +38,7 @@ body {
 
 /* 黑夜主题：深海星空 */
 .theme-night {
-  background: linear-gradient(135deg, #000000 0%, #09090a 100%);
+  background: radial-gradient(circle at 55% 38%, #18364b 0%, #0b2034 54%, #071525 100%);
   color: #E2E8F0;
 }
 
@@ -55,10 +55,11 @@ body {
   transition: all 0.3s ease;
 }
 .toggle-btn:hover {
-  background: currentColor;
-  color: #fff; /* 夜晚模式下 hover 可能需要单独调色，这里做基础反转 */
+  background: #2c3338;
+  color: #fff;
 }
 .theme-night .toggle-btn:hover {
+  background: #dcecf4;
   color: #0F172A;
 }
 
@@ -73,7 +74,98 @@ body {
   z-index: 1;
   left: 0;          /* 改为 left: 0，不再紧贴右侧 */
   width: 100vw;     /* 释放为 100% 全屏宽度 */
+  touch-action: none;
 
+}
+
+.scene-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: radial-gradient(circle at 50% 34%, #f8f4df 0%, #d9e9e6 54%, #a5cfda 100%);
+  color: #254b54;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.scene-transition-night {
+  background: radial-gradient(circle at 50% 34%, #1c3c51 0%, #102a3f 55%, #091827 100%);
+  color: #e5f1ed;
+}
+
+.transition-mark {
+  margin-bottom: 22px;
+  font-size: 27px;
+  font-weight: 300;
+  color: #ba9270;
+}
+
+.transition-eyebrow {
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  letter-spacing: .36em;
+  font-weight: 600;
+}
+
+.scene-transition h2 {
+  margin: 18px 0 22px;
+  font-size: clamp(36px, 6vw, 72px);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -.035em;
+}
+
+.transition-rule {
+  width: 44px;
+  height: 1px;
+  background: currentColor;
+  opacity: .4;
+}
+
+.transition-caption {
+  margin-top: 26px;
+  font-style: italic;
+  font-size: 15px;
+  opacity: .74;
+}
+
+.transition-progress {
+  width: min(320px, 72vw);
+  height: 3px;
+  margin-top: 30px;
+  overflow: hidden;
+  background: currentColor;
+  background: color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 4px;
+}
+
+.transition-progress > div {
+  height: 100%;
+  background: #d89e75;
+  border-radius: inherit;
+  transition: width .12s linear;
+}
+
+.transition-percentage {
+  margin-top: 11px;
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .16em;
+  opacity: .65;
+}
+
+.transition-wave {
+  position: absolute;
+  bottom: 7%;
+  font-size: 44px;
+  letter-spacing: .35em;
+  opacity: .25;
 }
 
 .ui-layer {
