@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  /* background: linear-gradient(135deg, #fff5c1 0%, #a2d5f7 100%);
+  color: #2C3338; 
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;  */
+
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+
+/* 确保你的 UI 元素字体颜色能继承 body 的深色 */
+.ui-element {
+  color: inherit;
+}
+
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  transition: background 1.5s ease, color 1.5s ease;
+}
+
+/* 白天主题：晨间海岛 */
+.theme-day {
+  background: linear-gradient(135deg, #fff5c1 0%, #a2d5f7 100%);
+  color: #2C3338;
+}
+
+/* 黑夜主题：深海星空 */
+.theme-night {
+  background: linear-gradient(135deg, #000000 0%, #09090a 100%);
+  color: #E2E8F0;
+}
+
+/* 日夜切换按钮样式 */
+.toggle-btn {
+  background: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+  padding: 6px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+}
+.toggle-btn:hover {
+  background: currentColor;
+  color: #fff; /* 夜晚模式下 hover 可能需要单独调色，这里做基础反转 */
+}
+.theme-night .toggle-btn:hover {
+  color: #0F172A;
+}
+
+
+
+.canvas-layer {
+  position: absolute;
+  top: 0;
+  right: 0;          /* 紧贴网页右侧 */
+  /* width: 65vw;  */
+  height: 100vh;
+  z-index: 1;
+  left: 0;          /* 改为 left: 0，不再紧贴右侧 */
+  width: 100vw;     /* 释放为 100% 全屏宽度 */
+
+}
+
+.ui-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  padding: 40px;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+.poem {
+  max-width: 300px;
+}
+
+.info {
+  text-align: right;
+}
+
+.center-title {
+  position: absolute;
+  top: 50%;
+  left: 16%;
+  transform: translate(-50%, -50%);
+  font-size: 8vw;
+  font-weight: 300;
+  letter-spacing: 0.5vw;
+  text-transform: capitalize;
+  mix-blend-mode: overlay;
+}
+
+.bottom-section {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+  pointer-events: auto;
+}
+
+button:hover {
+  opacity: 1;
+}
+
+/* 提示点击的呼吸光圈 */
+.glowing-indicator {
+  width: 16px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.4);
+  animation: pulse-ring 1.5s infinite ease-in-out;
+  cursor: pointer;
+  pointer-events: auto; /* 确保能被点击 */
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0.5; }
+}
