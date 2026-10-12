@@ -4,6 +4,8 @@ import { CameraControls, Environment, Lightformer, Sparkles, useProgress } from 
 import { EffectComposer, HueSaturation, Bloom } from '@react-three/postprocessing';
 import { Model as ItemA } from './ItemA'; 
 import ConstellationSky from './ConstellationSky';
+import BarStories from './BarStories';
+import BoatJourney from './BoatJourney';
 import './index.css';
 
 
@@ -19,6 +21,22 @@ const VIEW_CONFIG = {
   greenery: { position: [-1, 3, 1.5], target: [0, 1, 0] }
 };
 const MODEL_POSITION = [2, -3, 0];
+const POSTCARD_LINES = [
+  'The sea folds gold into the sand,',
+  'A quiet light upon my hand.',
+  'The palms lean close, the blue waves roam,',
+  'And every little breeze says home.'
+];
+
+function FallingPoem() {
+  let character = 0;
+  return <p className="postcard-poem" aria-label={POSTCARD_LINES.join(' ')}>
+    {POSTCARD_LINES.map((line, lineIndex) => <span className="postcard-poem-line" key={line} aria-hidden="true">
+      {Array.from(line).map((letter, index) => <span className="falling-letter" key={`${lineIndex}-${index}`}
+        style={{ '--fall-delay': `${Math.min(character++ * 28, 1700)}ms` }}>{letter === ' ' ? '\u00a0' : letter}</span>)}
+    </span>)}
+  </p>;
+}
 
 
 
@@ -92,8 +110,43 @@ function SceneLighting({ isDay }) {
 function App() {
   const [showPostcard, setShowPostcard] = useState(false);
   const [showStars, setShowStars] = useState(false);
+  const [drinkPanel, setDrinkPanel] = useState(null);
+  const [showJourney, setShowJourney] = useState(false);
 const [time, setTime] = useState(new Date());
-const [isMuted, setIsMuted] = useState(true);
+const [musicPlaying, setMusicPlaying] = useState(false);
+const bgmRef = useRef(null);
+const effectRef = useRef(null);
+const playInteractionSound = useCallback(() => {
+  const sound = effectRef.current;
+  if (!sound) return;
+  sound.currentTime = 0;
+  sound.volume = 0.28;
+  sound.play().catch(() => {});
+}, []);
+const toggleMusic = async () => {
+  if (!bgmRef.current) return;
+  if (musicPlaying) {
+    bgmRef.current.pause();
+    setMusicPlaying(false);
+  } else {
+    bgmRef.current.volume = 0.36;
+    try { await bgmRef.current.play(); setMusicPlaying(true); }
+    catch { setMusicPlaying(false); }
+  }
+};
+const tiltPostcard = event => {
+  const rect = event.currentTarget.getBoundingClientRect();
+  const x = (event.clientX - rect.left) / rect.width;
+  const y = (event.clientY - rect.top) / rect.height;
+  event.currentTarget.style.setProperty('--tilt-y', `${(x - .5) * 11}deg`);
+  event.currentTarget.style.setProperty('--tilt-x', `${(.5 - y) * 11}deg`);
+  event.currentTarget.style.setProperty('--shine-x', `${x * 100}%`);
+  event.currentTarget.style.setProperty('--shine-y', `${y * 100}%`);
+};
+const resetPostcard = event => {
+  event.currentTarget.style.setProperty('--tilt-y', '0deg');
+  event.currentTarget.style.setProperty('--tilt-x', '0deg');
+};
 const [isDay, setIsDay] = useState(true);
   const [modelReady, setModelReady] = useState(false);
   const [modelCenter, setModelCenter] = useState([2, -0.25, 0]);
@@ -153,6 +206,8 @@ const [isDay, setIsDay] = useState(true);
 
   return (
     <div className={`app-container ${isDay ? 'theme-day' : 'theme-night'}`}>
+      <audio ref={bgmRef} src="/bgm.mp3" loop preload="metadata" />
+      <audio ref={effectRef} src="/music1.mp3" preload="auto" />
       
       <div className="canvas-layer">
         <Canvas camera={{ position: [2, 5, 8], fov: 42 }}>
@@ -169,8 +224,11 @@ const [isDay, setIsDay] = useState(true);
               setCurrentView={setCurrentView}
               setShowPostcard={setShowPostcard} // 新增这行
               setShowStars={setShowStars}
+              setShowJourney={setShowJourney}
+              setDrinkPanel={setDrinkPanel}
               isDay={isDay}
               onReady={handleModelReady}
+              onInteractionSound={playInteractionSound}
             />
             <SceneLighting isDay={isDay} />
           </Suspense>
@@ -189,30 +247,32 @@ const [isDay, setIsDay] = useState(true);
       <div className="ui-layer pointer-events-none">
         {/* 原有顶部 UI 保持不变 */}
         <div className="top-section pointer-events-auto">
-          <div className="poem ui-element">
-            <p>The sky bleeds honey, slowly spreading.</p>
-            <p>The sun lingers, reluctant to sink,</p>
-            <p>trying to squeeze the whole horizon</p>
-            <p>into my chest.</p>
+          <div className="brand-block ui-element">
+            <h1 className="tech-profile" aria-label="Profile"><svg viewBox="0 0 255 70" role="presentation"><text x="2" y="53">Profile</text><text className="tech-profile-wire" x="2" y="53">Profile</text></svg></h1>
+            <div className="poem">
+              <p>The sky bleeds honey, slowly spreading.</p>
+              <p>The sun lingers, reluctant to sink,</p>
+              <p>trying to squeeze the whole horizon</p>
+              <p>into my chest.</p>
+            </div>
           </div>
           <div className="info ui-element" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-            <button className="toggle-btn" onClick={() => setTransition({ type: 'theme', target: isDay ? 'night' : 'day', progress: 0 })}
-              disabled={Boolean(transition)}>
-              {isDay ? '☾ NIGHT MODE' : '☀ DAY MODE'}
-            </button>
+            <div className="header-controls">
+              <button className="header-action" onClick={() => setTransition({ type: 'theme', target: isDay ? 'night' : 'day', progress: 0 })}
+                disabled={Boolean(transition)}><span>{isDay ? '☾ NIGHT MODE' : '☀ DAY MODE'}</span></button>
+              <button className={`header-action music-action ${musicPlaying ? 'is-playing' : ''}`} onClick={toggleMusic}
+                aria-label={musicPlaying ? 'Pause background music' : 'Play background music'} aria-pressed={musicPlaying}>
+                <span>{musicPlaying ? '♫ MUSIC ON' : '♪ MUSIC OFF'}</span>
+              </button>
+            </div>
             <p>{time.toDateString()}</p>
             <p>{time.toLocaleTimeString('en-US')}</p>
-            <p style={{ marginTop: '10px' }}>© {time.getFullYear()} Your Name</p>
           </div>
         </div>
         
         {/* <h2 className="center-title ui-element">Profile</h2> */}
         
-        <div className="bottom-section pointer-events-auto" style={{ paddingRight: '50px' }}>
-          <button className="ui-element" onClick={() => setIsMuted(!isMuted)}>
-            {isMuted ? 'UNMUTE' : 'MUTE'}
-          </button>
-        </div>
+        <div className="site-copyright ui-element">© 2026 Kymber</div>
 
         {/* ========================================== */}
         {/* 新增：可收起的底部胶囊导航栏 */}
@@ -284,23 +344,22 @@ const [isDay, setIsDay] = useState(true);
       {showPostcard && (
         <div className="postcard-overlay" role="presentation" onClick={() => setShowPostcard(false)}>
           <article className="postcard-sheet" role="dialog" aria-modal="true" aria-label="A postcard from the coast"
-            onClick={event => event.stopPropagation()}>
+            onClick={event => event.stopPropagation()} onPointerMove={tiltPostcard} onPointerLeave={resetPostcard}>
             <button type="button" className="postcard-close" aria-label="Close postcard"
               onClick={() => setShowPostcard(false)}>×</button>
+            <div className="postcard-pattern" aria-hidden="true">〰  ✦  〰  ✦  〰</div>
             <div className="postcard-stamp" aria-hidden="true">COAST<br />& STARS</div>
+            <div className="postcard-postmark" aria-hidden="true">COASTAL POST · 2026<span>━━━<br />━━━<br />━━━</span></div>
             <p className="postcard-kicker">A NOTE FROM THE SHORE</p>
             <h2>Where the tide remembers</h2>
-            <p className="postcard-poem">
-              The sea folds gold into the sand,<br />
-              A quiet light upon my hand.<br />
-              The palms lean close, the blue waves roam,<br />
-              And every little breeze says home.
-            </p>
+            <FallingPoem />
             <div className="postcard-signature">From the coast, with love.</div>
           </article>
         </div>
       )}
       {showStars && <ConstellationSky onClose={() => setShowStars(false)} />}
+      {drinkPanel && <BarStories panel={drinkPanel} onClose={() => setDrinkPanel(null)} />}
+      {showJourney && <BoatJourney onClose={() => setShowJourney(false)} />}
       {transition && (
         <div className={`scene-transition ${transition.type === 'theme' ? `scene-transition-${transition.target}` : 'scene-transition-day'}`}
           role="status" aria-label={transition.type === 'load' ? 'Loading coastal scene' : 'Changing time of day'}>
