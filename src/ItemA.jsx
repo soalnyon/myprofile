@@ -7,6 +7,7 @@ import WaterMaterial from './WaterMaterial'
 const MODEL_URL = '/midnight_coast_v3.glb'
 const noRaycast = () => {}
 const DRINK_NAMES = new Set(['Drink_Citrus', 'Drink_Coconut', 'Drink_Mint', 'Drink_Pink'])
+const DRINK_BY_PANEL = { profile: 'Drink_Coconut', highlights: 'Drink_Pink', posters: 'Drink_Mint', about: 'Drink_Citrus' }
 
 function InteractionHint({ label, onClick, subtle = false, position = [0, 0.18, 0] }) {
   return (
@@ -20,6 +21,54 @@ function InteractionHint({ label, onClick, subtle = false, position = [0, 0.18, 
       )}
     </Html>
   )
+}
+
+function AnimatedFeatureNode({ node, currentView, onInteract, motion, interactionProps }) {
+  const moving = useRef()
+  const started = useRef(-100)
+  const lastToken = useRef(0)
+  const isDrink = DRINK_NAMES.has(node.name)
+  const active = motion.name === node.name
+
+  useFrame(({ clock }) => {
+    if (!moving.current) return
+    if (active && motion.token !== lastToken.current) {
+      lastToken.current = motion.token
+      started.current = clock.elapsedTime
+    }
+    const progress = Math.min(1, Math.max(0, (clock.elapsedTime - started.current) / (isDrink ? .9 : .85)))
+    const arc = progress < 1 ? Math.sin(Math.PI * progress) : 0
+    if (isDrink) {
+      moving.current.position.y = .38 * arc + .035 * Math.sin(progress * Math.PI * 5) * arc
+      moving.current.rotation.z = -.17 * arc
+      moving.current.scale.setScalar(1 + .08 * arc)
+    } else {
+      moving.current.rotation.y = .27 * arc
+      moving.current.rotation.x = -.13 * arc
+    }
+  })
+
+  const panel = isDrink ? Object.keys(DRINK_BY_PANEL).find(key => DRINK_BY_PANEL[key] === node.name) : null
+  const interaction = isDrink ? (currentView === 'thebar' ? panel : 'thebar')
+    : (currentView === 'observatory' ? 'stars' : 'observatory')
+  return <group name={node.name} position={node.position} quaternion={node.quaternion} scale={node.scale}>
+    <group ref={moving}>
+      {node.isMesh && <mesh geometry={node.geometry} material={node.material}
+        morphTargetDictionary={node.morphTargetDictionary} morphTargetInfluences={node.morphTargetInfluences}
+        onClick={event => { event.stopPropagation(); onInteract(interaction) }}
+        onPointerOver={event => { event.stopPropagation(); document.body.style.cursor = 'pointer' }}
+        onPointerOut={() => { document.body.style.cursor = 'auto' }} />}
+      {node.children.map(child => <ModelNode key={child.uuid} node={child} currentView={currentView}
+        onInteract={onInteract} {...interactionProps} inheritedInteraction={interaction} />)}
+      {isDrink && currentView === 'thebar' && <InteractionHint
+        label={{ profile: 'View profile', highlights: 'View highlights', posters: 'View posters', about: 'View self evaluation' }[panel]}
+        position={[0, -0.14, 0.12]} onClick={() => onInteract(panel)} subtle />}
+      {!isDrink && currentView === 'observatory' && <InteractionHint label="Explore the constellations"
+        position={[0.5, 1.35, 0]} onClick={() => onInteract('stars')} />}
+      {isDrink && active && <Html key={motion.token} position={[0, .35, 0]} center distanceFactor={2.2}
+        style={{ pointerEvents: 'none' }}><span className="drink-magic" aria-hidden="true">✦ <i>✧</i> ✦</span></Html>}
+    </group>
+  </group>
 }
 
 function WaterClickRipple({ ripple }) {
@@ -182,13 +231,13 @@ function interactionFor(name) {
 // transforms survive future model revisions without hard-coded coordinates.
 function ModelNode({ node, currentView, onInteract, isDay, lampMaterial,
   onBoatAction, boatToken, onCoconutAction, coconutToken, coconutRunning,
-  onWaterRipple, waterRipple,
+  onWaterRipple, waterRipple, featureMotion,
   inheritedInteraction = null, inheritedWater = null }) {
   // Keep lighting owned by App's existing day/night setup.
   if (node.isLight || node.isCamera) return null
 
   const interactionProps = { isDay, lampMaterial, onBoatAction, boatToken,
-    onCoconutAction, coconutToken, coconutRunning, onWaterRipple, waterRipple }
+    onCoconutAction, coconutToken, coconutRunning, onWaterRipple, waterRipple, featureMotion }
   if (node.name === 'BoatMotionRoot') {
     return <BoatMotion node={node} currentView={currentView} onInteract={onInteract}
       {...interactionProps} />
@@ -196,6 +245,10 @@ function ModelNode({ node, currentView, onInteract, isDay, lampMaterial,
   if (node.name === 'Coconut_1') {
     return <FallingCoconut node={node} currentView={currentView} onInteract={onInteract}
       onCoconutAction={onCoconutAction} coconutToken={coconutToken} coconutRunning={coconutRunning} />
+  }
+  if (DRINK_NAMES.has(node.name) || node.name === 'Telescope') {
+    return <AnimatedFeatureNode node={node} currentView={currentView} onInteract={onInteract}
+      motion={featureMotion} interactionProps={interactionProps} />
   }
 
   const drinkPanel = currentView === 'thebar'
@@ -272,8 +325,10 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
   const [coconutToken, setCoconutToken] = useState(0)
   const [coconutRunning, setCoconutRunning] = useState(false)
   const [waterRipple, setWaterRipple] = useState(null)
+  const [featureMotion, setFeatureMotion] = useState({ name: null, token: 0 })
   const journeyTimer = useRef(null)
   const resourcesTimer = useRef(null)
+  const featureTimer = useRef(null)
   const center = useMemo(() => {
     const localCenter = new Box3().setFromObject(scene).getCenter(new Vector3())
     return localCenter.multiplyScalar(props.scale ?? 1).add(new Vector3(...props.position)).toArray()
@@ -287,6 +342,7 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
     document.body.style.cursor = 'auto'
     window.clearTimeout(journeyTimer.current)
     window.clearTimeout(resourcesTimer.current)
+    window.clearTimeout(featureTimer.current)
   }, [])
   useEffect(() => { onReady?.(center) }, [onReady, center])
   useEffect(() => {
@@ -302,9 +358,13 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
   const handleInteraction = (interaction) => {
     onInteractionSound?.()
     if (interaction === 'stars') {
-      setShowStars?.(true)
+      setFeatureMotion(value => ({ name: 'Telescope', token: value.token + 1 }))
+      window.clearTimeout(featureTimer.current)
+      featureTimer.current = window.setTimeout(() => setShowStars?.(true), 850)
     } else if (['profile', 'highlights', 'posters', 'about'].includes(interaction)) {
-      setDrinkPanel?.(interaction)
+      setFeatureMotion(value => ({ name: DRINK_BY_PANEL[interaction], token: value.token + 1 }))
+      window.clearTimeout(featureTimer.current)
+      featureTimer.current = window.setTimeout(() => setDrinkPanel?.(interaction), 900)
     } else if (interaction === 'postcard') {
       if (currentView === 'beach') setShowPostcard?.(true)
       else setCurrentView?.('beach')
@@ -316,7 +376,7 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
   return (
     <group ref={group} {...props} dispose={null}>
       <ModelNode node={scene} currentView={currentView} onInteract={handleInteraction}
-        isDay={isDay} lampMaterial={lampMaterial}
+        isDay={isDay} lampMaterial={lampMaterial} featureMotion={featureMotion}
         onBoatAction={() => {
           onInteractionSound?.()
           setBoatToken(value => value + 1)
