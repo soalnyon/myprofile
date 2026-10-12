@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 
 const planets = [
-  { title: 'Data & Insight', text: '熟悉 SQL / VBA，熟练使用 SPSS / Tableau 等数据分析软件', sprite: 0 },
+  { title: 'Data & Insight', text: '熟悉 SQL / VBA, 熟练使用 SPSS / Tableau 等数据分析软件', sprite: 0 },
   { title: 'Code & Creation', text: '熟悉 JavaScript / Java / C 等编程语言，并辅佐 Vibe Coding', sprite: 1 },
-  { title: 'Visual Storytelling', text: '熟练使用 Adobe 系列软件：Photoshop / Premiere Pro / Illustrator', sprite: 2 },
-  { title: 'Design & Systems', text: '熟悉 Axure / Figma / Visio / Canva 可画 / Echarts 等设计与可视化工具', sprite: 5 },
-  { title: 'Languages', text: 'IELTS 7.0 / CET-6 532 / TOPIK 5 级（215），拥有良好的听说读写能力', sprite: 7 },
+  { title: 'Visual Storytelling', text: '熟悉 Adobe 系列软件: Photoshop / Premiere Pro / Illustrator', sprite: 2 },
+  { title: 'Design & Systems', text: '熟悉 Axure / Figma / Visio / Canva / Echarts 等可视化工具', sprite: 5 },
+  { title: 'Languages', text: 'IELTS 7.0 / CET-6 532 / TOPIK (5 级) 良好的听说读写能力', sprite: 7 },
 ]
 
 const spritePosition = index => ({

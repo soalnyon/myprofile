@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { FaArrowUpRightFromSquare, FaBrain, FaImage, FaPalette, FaRobot, FaWandMagicSparkles } from 'react-icons/fa6'
-import { SiDeepseek, SiFreepik, SiGoogle, SiGooglegemini, SiPoe, SiPerplexity, SiConvertio } from 'react-icons/si'
+import { FaArrowUpRightFromSquare, FaBrain, FaBookOpen, FaEnvelope, FaFilePdf, FaFilePowerpoint, FaImage, FaLayerGroup, FaLightbulb, FaNoteSticky, FaPalette, FaPen, FaPhone, FaRobot, FaSwatchbook, FaWandMagicSparkles } from 'react-icons/fa6'
+import { SiDeepseek, SiDeepl, SiFigma, SiFreepik, SiGithub, SiGoogle, SiGooglegemini, SiNotion, SiPhotopea, SiPinterest, SiPoe, SiPerplexity, SiConvertio, SiThreedotjs } from 'react-icons/si'
 
 const sections = [
   {
@@ -17,13 +17,28 @@ const sections = [
     ],
   },
   {
-    title: '设计灵感', subtitle: 'MAKE / IMAGINE', icon: FaPalette,
+    title: '灵感来源', subtitle: 'MAKE / IMAGINE', icon: FaPalette,
     items: [
       { name: '即梦', url: 'https://jimeng.jianying.com/ai-tool/image/generate', icon: FaImage },
       { name: 'Ideogram', url: 'https://ideogram.ai/', icon: FaWandMagicSparkles },
       { name: 'Liblib', url: 'https://www.liblib.art/sd', icon: FaPalette },
       { name: 'Lovart', url: 'https://www.lovart.ai/', icon: FaWandMagicSparkles },
       { name: 'Freepik', url: 'http://freepik.com', icon: SiFreepik },
+      { name: 'Pinterest', url: 'https://www.pinterest.com/', icon: SiPinterest },
+      { name: 'Designspiration', url: 'https://www.designspiration.com/', icon: FaLightbulb },
+      { name: 'Three.js', url: 'https://threejs.org/', icon: SiThreedotjs },
+      { name: 'Color Hunt', url: 'https://www.colorhunt.co/', icon: FaSwatchbook },
+      { name: 'ColorSpace', url: 'https://mycolor.space/gradient3', icon: FaPalette },
+    ],
+  },
+  {
+    title: '思绪重构', subtitle: 'PLAN / WRITE / PRESENT', icon: FaBookOpen,
+    items: [
+      { name: 'Gamma', url: 'https://gamma.app/', icon: FaFilePowerpoint },
+      { name: 'Slidesgo', url: 'https://slidesgo.com/', icon: FaLayerGroup },
+      { name: 'Napkin', url: 'https://app.napkin.ai/page', icon: FaPen },
+      { name: '有道云', url: 'https://note.youdao.com/web/#', icon: FaNoteSticky },
+      { name: 'Notion', url: 'https://www.notion.com/', icon: SiNotion },
     ],
   },
   {
@@ -31,6 +46,12 @@ const sections = [
     items: [
       { name: 'Canva', url: 'http://www.canva.cn', icon: FaPalette },
       { name: 'Convertio', url: 'https://convertio.co/zh/', icon: SiConvertio },
+      { name: 'GitHub', url: 'https://github.com/', icon: SiGithub },
+      { name: 'Figma', url: 'https://www.figma.com/files/drafts', icon: SiFigma },
+      { name: 'Recraft', url: 'https://www.recraft.ai/', icon: FaWandMagicSparkles },
+      { name: 'Photopea', url: 'https://www.photopea.com/', icon: SiPhotopea },
+      { name: 'DeepL', url: 'https://www.deepl.com/zh/translator', icon: SiDeepl },
+      { name: 'Qwerty', url: 'https://qwerty.kaiyi.cool/', icon: FaBookOpen },
     ],
   },
 ]
@@ -67,10 +88,20 @@ export default function ResourcePortal({ onClose }) {
             <item.icon className="resource-link-icon" aria-hidden="true" />
             <span>{item.name}</span><FaArrowUpRightFromSquare className="resource-arrow" aria-hidden="true" />
           </a>)}
-          {sectionIndex === 2 && <div className="resource-empty"><span>✦</span> MORE TO COME</div>}
+          {sectionIndex === sections.length - 1 && <div className="resource-empty"><span>✦</span> MORE TO COME</div>}
         </div>
       </section>)}
     </div>
-    <footer className="resource-footer">A SMALL COLLECTION FROM THE COAST <span>✦</span> GROWING WITH TIME</footer>
+    <footer className="resource-footer">
+      <div className="resource-contact-title"><span>05 / SAY HELLO</span><h3>Contact me.</h3></div>
+      <div className="resource-contact-links">
+        <a href="mailto:wzh139628@gmail.com"><FaEnvelope aria-hidden="true" /> wzh139628@gmail.com</a>
+        <a href="tel:18451037068"><FaPhone aria-hidden="true" /> 184 5103 7068</a>
+      </div>
+      <p>A SMALL COLLECTION FROM THE COAST <span>✦</span> GROWING WITH TIME</p>
+    </footer>
+    <a className="resource-cv-float" href="/cv22.pdf" target="_blank" rel="noopener noreferrer" aria-label="查看完整简历 PDF" title="查看完整简历">
+      <FaFilePdf aria-hidden="true" /><span>查看完整简历</span>
+    </a>
   </section>
 }

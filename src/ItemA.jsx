@@ -259,7 +259,7 @@ function ModelNode({ node, currentView, onInteract, isDay, lampMaterial,
       )}
       {DRINK_NAMES.has(node.name) && currentView === 'thebar' && (
         <InteractionHint label={drinkPanel === 'profile' ? 'View profile' : drinkPanel === 'highlights' ? 'View highlights' : drinkPanel === 'posters' ? 'View posters' : 'View self evaluation'}
-          onClick={drinkPanel ? () => onInteract(drinkPanel) : undefined} subtle />
+          position={[0, -0.14, 0.12]} onClick={drinkPanel ? () => onInteract(drinkPanel) : undefined} subtle />
       )}
     </Component>
   )
