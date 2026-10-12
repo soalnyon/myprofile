@@ -265,7 +265,7 @@ function ModelNode({ node, currentView, onInteract, isDay, lampMaterial,
   )
 }
 
-export function Model({ currentView, setCurrentView, setShowPostcard, setShowStars, setShowJourney, setDrinkPanel, isDay, onReady, onInteractionSound, ...props }) {
+export function Model({ currentView, setCurrentView, setShowPostcard, setShowStars, setShowJourney, setShowResources, setDrinkPanel, isDay, onReady, onInteractionSound, ...props }) {
   const { scene } = useGLTF(MODEL_URL)
   const group = useRef()
   const [boatToken, setBoatToken] = useState(0)
@@ -273,6 +273,7 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
   const [coconutRunning, setCoconutRunning] = useState(false)
   const [waterRipple, setWaterRipple] = useState(null)
   const journeyTimer = useRef(null)
+  const resourcesTimer = useRef(null)
   const center = useMemo(() => {
     const localCenter = new Box3().setFromObject(scene).getCenter(new Vector3())
     return localCenter.multiplyScalar(props.scale ?? 1).add(new Vector3(...props.position)).toArray()
@@ -282,7 +283,11 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
     if (material) material.emissiveIntensity = 5
     return material
   }, [scene])
-  useEffect(() => () => { document.body.style.cursor = 'auto'; window.clearTimeout(journeyTimer.current) }, [])
+  useEffect(() => () => {
+    document.body.style.cursor = 'auto'
+    window.clearTimeout(journeyTimer.current)
+    window.clearTimeout(resourcesTimer.current)
+  }, [])
   useEffect(() => { onReady?.(center) }, [onReady, center])
   useEffect(() => {
     if (!coconutRunning) return
@@ -323,7 +328,13 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
           const point = event.object.worldToLocal(event.point.clone())
           setWaterRipple({ x: point.x, y: point.y, z: point.z, token: Date.now() })
         }} waterRipple={waterRipple}
-        onCoconutAction={() => { onInteractionSound?.(); setCoconutRunning(true); setCoconutToken(value => value + 1) }}
+        onCoconutAction={() => {
+          onInteractionSound?.()
+          setCoconutRunning(true)
+          setCoconutToken(value => value + 1)
+          window.clearTimeout(resourcesTimer.current)
+          resourcesTimer.current = window.setTimeout(() => setShowResources?.(true), 1350)
+        }}
         coconutToken={coconutToken} coconutRunning={coconutRunning} />
     </group>
   )

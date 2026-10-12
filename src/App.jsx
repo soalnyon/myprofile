@@ -6,6 +6,9 @@ import { Model as ItemA } from './ItemA';
 import ConstellationSky from './ConstellationSky';
 import BarStories from './BarStories';
 import BoatJourney from './BoatJourney';
+import TechProfile from './TechProfile';
+import ClickSpark from './ClickSpark';
+import ResourcePortal from './ResourcePortal';
 import './index.css';
 
 
@@ -21,6 +24,16 @@ const VIEW_CONFIG = {
   greenery: { position: [-1, 3, 1.5], target: [0, 1, 0] }
 };
 const MODEL_POSITION = [2, -3, 0];
+const MODEL_ROTATION = -Math.PI / 5.2;
+const rotateWithModel = ([x, y, z]) => {
+  const dx = x - MODEL_POSITION[0];
+  const dz = z - MODEL_POSITION[2];
+  return [
+    MODEL_POSITION[0] + dx * Math.cos(MODEL_ROTATION) + dz * Math.sin(MODEL_ROTATION),
+    y,
+    MODEL_POSITION[2] - dx * Math.sin(MODEL_ROTATION) + dz * Math.cos(MODEL_ROTATION),
+  ];
+};
 const POSTCARD_LINES = [
   'The sea folds gold into the sand,',
   'A quiet light upon my hand.',
@@ -43,13 +56,19 @@ function FallingPoem() {
 // ==========================================
 // 2. 相机动画控制器组件
 // ==========================================
-function CameraAnimator({ currentView, modelCenter }) {
+function CameraAnimator({ currentView, modelCenter, isMobile }) {
   const controlsRef = useRef();
 
   useEffect(() => {
     if (controlsRef.current && VIEW_CONFIG[currentView]) {
-      const { position, target: viewTarget } = VIEW_CONFIG[currentView];
-      const target = currentView === 'overview' ? modelCenter : viewTarget;
+      const { position: viewPosition, target: viewTarget } = VIEW_CONFIG[currentView];
+      const overview = currentView === 'overview';
+      const target = overview ? modelCenter : rotateWithModel(viewTarget);
+      let position = overview ? viewPosition : rotateWithModel(viewPosition);
+      if (isMobile) {
+        const distanceScale = overview ? 2.05 : 1.35;
+        position = position.map((coordinate, index) => target[index] + (coordinate - target[index]) * distanceScale);
+      }
       // 开启平滑过渡 (true)
       controlsRef.current.setLookAt(
         position[0], position[1], position[2],
@@ -57,7 +76,7 @@ function CameraAnimator({ currentView, modelCenter }) {
         true 
       );
     }
-  }, [currentView, modelCenter]);
+  }, [currentView, modelCenter, isMobile]);
 
   return (
     <CameraControls 
@@ -112,7 +131,20 @@ function App() {
   const [showStars, setShowStars] = useState(false);
   const [drinkPanel, setDrinkPanel] = useState(null);
   const [showJourney, setShowJourney] = useState(false);
-const [time, setTime] = useState(new Date());
+  const [showResources, setShowResources] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 700px)').matches);
+  const [spark, setSpark] = useState(null);
+  const triggerSpark = event => {
+    if (event.button !== undefined && event.button !== 0) return;
+    setSpark({ x: event.clientX, y: event.clientY, id: performance.now() });
+  };
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 700px)');
+    const update = () => setIsMobile(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+const [time, setTime] = useState(() => new Date());
 const [musicPlaying, setMusicPlaying] = useState(false);
 const bgmRef = useRef(null);
 const effectRef = useRef(null);
@@ -125,12 +157,11 @@ const playInteractionSound = useCallback(() => {
 }, []);
 const toggleMusic = async () => {
   if (!bgmRef.current) return;
-  if (musicPlaying) {
+  if (!bgmRef.current.paused) {
     bgmRef.current.pause();
-    setMusicPlaying(false);
   } else {
     bgmRef.current.volume = 0.36;
-    try { await bgmRef.current.play(); setMusicPlaying(true); }
+    try { await bgmRef.current.play(); }
     catch { setMusicPlaying(false); }
   }
 };
@@ -205,8 +236,9 @@ const [isDay, setIsDay] = useState(true);
   }, []);
 
   return (
-    <div className={`app-container ${isDay ? 'theme-day' : 'theme-night'}`}>
-      <audio ref={bgmRef} src="/bgm.mp3" loop preload="metadata" />
+    <div className={`app-container ${isDay ? 'theme-day' : 'theme-night'}`} onPointerDownCapture={triggerSpark}>
+      <audio ref={bgmRef} src="/bgm.mp3" loop preload="metadata"
+        onPlay={() => setMusicPlaying(true)} onPause={() => setMusicPlaying(false)} onEnded={() => setMusicPlaying(false)} />
       <audio ref={effectRef} src="/music1.mp3" preload="auto" />
       
       <div className="canvas-layer">
@@ -220,11 +252,13 @@ const [isDay, setIsDay] = useState(true);
             {/* <ItemA scale={0.5} position={[2, -2, 0]} setCurrentView={setCurrentView} /> */}
             <ItemA 
               scale={0.5} position={MODEL_POSITION}
+              rotation={[0, MODEL_ROTATION, 0]}
               currentView={currentView} 
               setCurrentView={setCurrentView}
               setShowPostcard={setShowPostcard} // 新增这行
               setShowStars={setShowStars}
               setShowJourney={setShowJourney}
+              setShowResources={setShowResources}
               setDrinkPanel={setDrinkPanel}
               isDay={isDay}
               onReady={handleModelReady}
@@ -234,7 +268,7 @@ const [isDay, setIsDay] = useState(true);
           </Suspense>
           
           {/* 挂载独立的相机动画控制器 */}
-          <CameraAnimator currentView={currentView} modelCenter={modelCenter} />
+          <CameraAnimator currentView={currentView} modelCenter={modelCenter} isMobile={isMobile} />
 
           <EffectComposer disableNormalPass>
             <HueSaturation saturation={isDay ? 0.12 : 0.21} hue={0} />
@@ -248,7 +282,7 @@ const [isDay, setIsDay] = useState(true);
         {/* 原有顶部 UI 保持不变 */}
         <div className="top-section pointer-events-auto">
           <div className="brand-block ui-element">
-            <h1 className="tech-profile" aria-label="Profile"><svg viewBox="0 0 255 70" role="presentation"><text x="2" y="53">Profile</text><text className="tech-profile-wire" x="2" y="53">Profile</text></svg></h1>
+            <TechProfile />
             <div className="poem">
               <p>The sky bleeds honey, slowly spreading.</p>
               <p>The sun lingers, reluctant to sink,</p>
@@ -265,8 +299,8 @@ const [isDay, setIsDay] = useState(true);
                 <span>{musicPlaying ? '♫ MUSIC ON' : '♪ MUSIC OFF'}</span>
               </button>
             </div>
-            <p>{time.toDateString()}</p>
-            <p>{time.toLocaleTimeString('en-US')}</p>
+            <p className="header-time">{time.toDateString()}</p>
+            <p className="header-time">{time.toLocaleTimeString('en-US')}</p>
           </div>
         </div>
         
@@ -277,7 +311,7 @@ const [isDay, setIsDay] = useState(true);
         {/* ========================================== */}
         {/* 新增：可收起的底部胶囊导航栏 */}
         {/* ========================================== */}
-        <div style={{
+        <div className="site-navigation" style={{
           position: 'absolute',
           bottom: '40px',
           left: '50%',
@@ -288,7 +322,7 @@ const [isDay, setIsDay] = useState(true);
           pointerEvents: 'auto'
         }}>
           {navExpanded && (
-            <div style={{
+            <div className="nav-items" style={{
               display: 'flex',
               background: 'rgba(25, 25, 30, 0.65)',
               backdropFilter: 'blur(10px)',
@@ -312,7 +346,8 @@ const [isDay, setIsDay] = useState(true);
                   }}
                 >
                   {item.key === 'overview' && '◇ '}
-                  {item.label}
+                  <span className="nav-label-desktop">{item.label}</span>
+                  <span className="nav-label-mobile">{({ overview: 'Home', thebar: 'Bar', boat: 'Boat', observatory: 'Stars', beach: 'Beach', greenery: 'Palm' })[item.key]}</span>
                 </button>
               ))}
             </div>
@@ -360,14 +395,16 @@ const [isDay, setIsDay] = useState(true);
       {showStars && <ConstellationSky onClose={() => setShowStars(false)} />}
       {drinkPanel && <BarStories panel={drinkPanel} onClose={() => setDrinkPanel(null)} />}
       {showJourney && <BoatJourney onClose={() => setShowJourney(false)} />}
+      {showResources && <ResourcePortal onClose={() => setShowResources(false)} />}
+      <ClickSpark spark={spark} onEnd={() => setSpark(null)} />
       {transition && (
         <div className={`scene-transition ${transition.type === 'theme' ? `scene-transition-${transition.target}` : 'scene-transition-day'}`}
           role="status" aria-label={transition.type === 'load' ? 'Loading coastal scene' : 'Changing time of day'}>
           <div className="transition-mark" aria-hidden="true">✦</div>
           <p className="transition-eyebrow">COAST & STARS</p>
-          <h2>{transition.type === 'load' ? 'A shore to explore' : transition.target === 'night' ? 'When the sun sets' : 'When morning returns'}</h2>
+          <h2>{transition.type === 'load' ? 'Ready to explore ?' : transition.target === 'night' ? 'When the sun sets' : 'When morning returns'}</h2>
           <div className="transition-rule" aria-hidden="true" />
-          <p className="transition-caption">{transition.type === 'load' ? 'Finding the shoreline' : 'Changing the light'}</p>
+          <p className="transition-caption">{transition.type === 'load' ? '欢迎参观' : 'Changing the light'}</p>
           <div className="transition-progress" role="progressbar"
             aria-valuemin={0} aria-valuemax={100}
             aria-valuenow={transition.type === 'load' ? (modelReady ? 100 : Math.min(95, Math.round(loadProgress))) : transition.progress}>
