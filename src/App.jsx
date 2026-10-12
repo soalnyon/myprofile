@@ -19,7 +19,7 @@ const VIEW_CONFIG = {
   overview: { position: [2, 5, 8], target: [0, -2, 0] },
   thebar: { position: [3, 0, 4], target: [2, -1, 0] },
   boat: { position: [5.5, 1, 3], target: [3.9, -2.1, 1.15] },
-  observatory: { position: [5, 3, 2.5], target: [2, 0, -1] },
+  observatory: { position: [5, 2, 2.5], target: [3, 0, -1] },
   beach: { position: [1.1, -1, 3], target: [0, -1.5, 0] },
   greenery: { position: [-1, 3, 1.5], target: [0, 1, 0] }
 };
