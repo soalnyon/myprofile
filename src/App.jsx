@@ -17,7 +17,7 @@ import './index.css';
 // ==========================================
 const VIEW_CONFIG = {
   overview: { position: [2, 5, 8], target: [0, -2, 0] },
-  thebar: { position: [3, 0, 3], target: [2, -1, 0] },
+  thebar: { position: [3, -0.65, 3], target: [2, -1, 0] },
   boat: { position: [5.5, 1, 3], target: [3.9, -2.1, 1.15] },
   observatory: { position: [5, 2, 2.5], target: [3, 0, -1] },
   beach: { position: [1.1, -1, 3], target: [0, -1.5, 0] },
@@ -25,6 +25,7 @@ const VIEW_CONFIG = {
 };
 const MODEL_POSITION = [2, -3, 0];
 const MODEL_ROTATION = -Math.PI / 5.2;
+const MOBILE_BAR_VIEW = { position: [3.3, 0, 3], target: [2.3, -1, 0] };
 const rotateWithModel = ([x, y, z]) => {
   const dx = x - MODEL_POSITION[0];
   const dz = z - MODEL_POSITION[2];
@@ -61,12 +62,13 @@ function CameraAnimator({ currentView, modelCenter, isMobile }) {
 
   useEffect(() => {
     if (controlsRef.current && VIEW_CONFIG[currentView]) {
-      const { position: viewPosition, target: viewTarget } = VIEW_CONFIG[currentView];
+      const { position: viewPosition, target: viewTarget } = isMobile && currentView === 'thebar'
+        ? MOBILE_BAR_VIEW : VIEW_CONFIG[currentView];
       const overview = currentView === 'overview';
       const target = overview ? modelCenter : rotateWithModel(viewTarget);
       let position = overview ? viewPosition : rotateWithModel(viewPosition);
       if (isMobile) {
-        const distanceScale = overview ? 2.05 : 1.35;
+        const distanceScale = overview ? 2.05 : currentView === 'thebar' ? 1.65 : 1.35;
         position = position.map((coordinate, index) => target[index] + (coordinate - target[index]) * distanceScale);
       }
       // 开启平滑过渡 (true)
