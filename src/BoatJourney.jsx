@@ -2,9 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 export default function BoatJourney({ onClose }) {
   const [front, setFront] = useState(0)
-  const [swapping, setSwapping] = useState(false)
   const dragStart = useRef(null)
-  const swapTimer = useRef(null)
 
   useEffect(() => {
     const onKeyDown = event => {
@@ -12,13 +10,11 @@ export default function BoatJourney({ onClose }) {
       if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') setFront(value => 1 - value)
     }
     window.addEventListener('keydown', onKeyDown)
-    return () => { window.removeEventListener('keydown', onKeyDown); window.clearTimeout(swapTimer.current) }
+    return () => window.removeEventListener('keydown', onKeyDown)
   }, [onClose])
 
   const swap = () => {
-    if (swapping) return
-    setSwapping(true)
-    swapTimer.current = window.setTimeout(() => { setFront(value => 1 - value); setSwapping(false) }, 420)
+    setFront(value => 1 - value)
   }
 
   return <section className="voyage-scene" role="dialog" aria-modal="true" aria-label="工作与实践经历">
@@ -26,7 +22,7 @@ export default function BoatJourney({ onClose }) {
     <button type="button" className="voyage-close" aria-label="关闭经历" onClick={onClose}>×</button>
     <header className="voyage-heading"><span>BOAT / A VOYAGE OF EXPERIENCE</span><h2>Along the way</h2>
       <p>每段经历，都是驶向下一片海的航标。</p></header>
-    <div className={`voyage-stack ${swapping ? 'is-swapping' : ''}`}
+    <div className="voyage-stack"
       onPointerDown={event => { dragStart.current = event.clientX }}
       onPointerUp={event => { if (dragStart.current !== null && Math.abs(event.clientX - dragStart.current) > 55) swap(); dragStart.current = null }}>
       <article className={`voyage-card voyage-work ${front === 0 ? 'is-front' : 'is-back'}`}>
@@ -52,7 +48,7 @@ export default function BoatJourney({ onClose }) {
       </article>
     </div>
     <button type="button" className="voyage-swap" onClick={swap} aria-label={front === 0 ? '查看实践经历' : '查看工作经历'}>
-      <span>↗</span> {front === 0 ? 'TURN TO PRACTICE' : 'BACK TO WORK'}
+      {front === 0 ? 'TURN TO PRACTICE' : 'BACK TO WORK'}
     </button>
     <p className="voyage-instruction">CLICK TO SWAP · ← →</p>
   </section>

@@ -29,8 +29,8 @@ const highlights = [
 ]
 
 const posters = [
-  ...Array.from({ length: 4 }, (_, index) => ({ src: `/海报${index + 1}.png`, shape: 'portrait' })),
-  ...Array.from({ length: 5 }, (_, index) => ({ src: `/入口图${index + 1}.png`, shape: 'landscape' })),
+  ...Array.from({ length: 4 }, (_, index) => ({ src: `/poster-previews/海报${index + 1}.webp`, full: `/poster-full/海报${index + 1}.webp`, shape: 'portrait' })),
+  ...Array.from({ length: 5 }, (_, index) => ({ src: `/poster-previews/入口图${index + 1}.webp`, full: `/poster-full/入口图${index + 1}.webp`, shape: 'landscape' })),
 ]
 
 function CircularPosterCarousel() {
@@ -80,7 +80,7 @@ function CircularPosterCarousel() {
     </div>
     {zoomed !== null && <div className="poster-zoom" role="presentation" onClick={() => setZoomed(null)}>
       <button type="button" aria-label="关闭图片" onClick={() => setZoomed(null)}>×</button>
-      <img src={posters[zoomed].src} alt={`视觉作品 ${zoomed + 1}`} />
+      <img src={posters[zoomed].full} alt={`视觉作品 ${zoomed + 1}`} />
     </div>}
   </div>
 }

@@ -43,22 +43,27 @@ export default function ResourcePortal({ onClose }) {
   }, [onClose])
 
   return <section className="resource-portal" role="dialog" aria-modal="true" aria-label="常用工具与资源导航">
-    <div className="resource-portal-glow" aria-hidden="true" />
+    <div className="resource-sun" aria-hidden="true" />
     <button type="button" className="resource-close" aria-label="关闭资源导航" onClick={onClose}>×</button>
     <header className="resource-heading">
-      <span>GREENERY / GROW YOUR IDEAS</span>
-      <h2>Little tools, big worlds.</h2>
-      <p>从椰子树下出发，收藏一些常用的灵感与工具。</p>
+      <span>FIELD NOTES / 01 — THE PALM</span>
+      <h2>A little island<br /><em>of ideas.</em></h2>
+      <p>常用的工具和灵感，收在这片椰影之下。</p>
     </header>
     <div className="resource-sections">
       {sections.map((section, sectionIndex) => <section className="resource-section" key={section.title}
         style={{ '--section-delay': `${sectionIndex * 100}ms` }}>
-        <div className="resource-section-head"><section.icon aria-hidden="true" /><div>
+        <div className="resource-section-head"><span className="resource-section-number">0{sectionIndex + 1}</span><div>
           <span>{section.subtitle}</span><h3>{section.title}</h3>
         </div></div>
         <div className="resource-grid">
           {section.items.map((item, index) => <a className="resource-link" key={item.name} href={item.url}
-            target="_blank" rel="noopener noreferrer" style={{ '--item-delay': `${index * 40}ms` }}>
+            target="_blank" rel="noopener noreferrer" style={{ '--item-delay': `${index * 40}ms` }}
+            onPointerMove={event => {
+              const bounds = event.currentTarget.getBoundingClientRect()
+              event.currentTarget.style.setProperty('--glare-x', `${event.clientX - bounds.left}px`)
+              event.currentTarget.style.setProperty('--glare-y', `${event.clientY - bounds.top}px`)
+            }}>
             <item.icon className="resource-link-icon" aria-hidden="true" />
             <span>{item.name}</span><FaArrowUpRightFromSquare className="resource-arrow" aria-hidden="true" />
           </a>)}

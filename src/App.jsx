@@ -17,7 +17,7 @@ import './index.css';
 // ==========================================
 const VIEW_CONFIG = {
   overview: { position: [2, 5, 8], target: [0, -2, 0] },
-  thebar: { position: [3, 0, 5], target: [2, -1, 0] },
+  thebar: { position: [3, 0, 4], target: [2, -1, 0] },
   boat: { position: [5.5, 1, 3], target: [3.9, -2.1, 1.15] },
   observatory: { position: [5, 3, 2.5], target: [2, 0, -1] },
   beach: { position: [1.1, -1, 3], target: [0, -1.5, 0] },
@@ -106,6 +106,8 @@ function SceneLighting({ isDay }) {
         color={isDay ? '#fff8e7' : '#dce8ed'} />
       <directionalLight position={[-4, 4, -3]} intensity={isDay ? 0.6 : 0.5}
         color={isDay ? '#d6e8e5' : '#96b5c5'} />
+      {isDay && <Sparkles count={42} scale={[7, 3.2, 6]} size={1.5} speed={0.12}
+        opacity={0.46} color="#fff3cf" position={[0, 0.3, 0]} />}
       {!isDay && (
         <>
           {/* Pendant bulb in the GLB is at [0.7, 2.82, -0.45], with model scale 0.5. */}
@@ -115,8 +117,8 @@ function SceneLighting({ isDay }) {
             color="#ffc67a" distance={3.2} decay={2} />
           <pointLight position={[3.6, -0.55, 0.55]} intensity={1.2}
             color="#ffd19a" distance={3} decay={2} />
-          <Sparkles count={85} scale={8} size={2.7} speed={0.3}
-            opacity={0.78} color="#ffd48d" position={[0, 0.5, 0]} />
+          <Sparkles count={100} scale={8} size={3.1} speed={0.34}
+            opacity={0.98} color="#ffe0a1" position={[0, 0.5, 0]} />
         </>
       )}
     </>
@@ -222,12 +224,12 @@ const [isDay, setIsDay] = useState(true);
 
   // 导航栏配置
   const navItems = [
-    { label: 'Overview', key: 'overview' },
-    { label: 'The Bar', key: 'thebar' },
+    { label: 'Home', key: 'overview' },
+    { label: 'Bar', key: 'thebar' },
     { label: 'Boat', key: 'boat' },
-    { label: 'Observatory', key: 'observatory' },
+    { label: 'Stars', key: 'observatory' },
     { label: 'Beach', key: 'beach' },
-    { label: 'Greenery', key: 'greenery' }
+    { label: 'Palm', key: 'greenery' }
   ];
 
   useEffect(() => {
@@ -346,8 +348,7 @@ const [isDay, setIsDay] = useState(true);
                   }}
                 >
                   {item.key === 'overview' && '◇ '}
-                  <span className="nav-label-desktop">{item.label}</span>
-                  <span className="nav-label-mobile">{({ overview: 'Home', thebar: 'Bar', boat: 'Boat', observatory: 'Stars', beach: 'Beach', greenery: 'Palm' })[item.key]}</span>
+                  {item.label}
                 </button>
               ))}
             </div>
