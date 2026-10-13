@@ -7,22 +7,22 @@ const education = [
 
 const highlights = [
   {
-    number: '01', title: '公众号运营', English: 'EDITORIAL', color: '#F7AE88',
+    number: '01', title: '公众号运营', English: 'EDITORIAL', color: '#D99D7B',
     summary: '把活动与品牌故事写成值得阅读的内容。',
     details: ['撰写活动推广、活动总结与节日类推文。', '独立策划内容逻辑和活动文案，提升用户黏性。'],
   },
   {
-    number: '02', title: '线下活动支持', English: 'IN PERSON', color: '#F5C39D',
+    number: '02', title: '线下活动支持', English: 'IN PERSON', color: '#D6B476',
     summary: '让每一次见面都有清晰、统一的表达。',
     details: ['支持校园开放日、主题讲座、咨询答疑会和展会的全流程执行。', '制作项目宣讲 PPT 与活动物料，参与线下活动 20 余场。'],
   },
   {
-    number: '03', title: '线上项目推广', English: 'DIGITAL', color: '#8BD6D1',
+    number: '03', title: '线上项目推广', English: 'DIGITAL', color: '#82AFC0',
     summary: '从用户洞察出发，持续优化推广。',
     details: ['分析招生数据，形成学生画像。', '推广短信覆盖 6 万余用户，跟进广告投放并优化物料与投放机制。'],
   },
   {
-    number: '04', title: '内容策划', English: 'STORYTELLING', color: '#F6D07F',
+    number: '04', title: '内容策划', English: 'STORYTELLING', color: '#A6A98A',
     summary: '用内容连接活动、渠道与人。',
     details: ['策划年度内容主题、活动文案和广告文案。', '制作招生邮件模板等标准化材料，搭建内容模板与执行流程。'],
   },
@@ -188,20 +188,21 @@ export default function BarStories({ panel, onClose }) {
               {highlights.map((item, index) => (
                 <button type="button" key={item.number}
                   className={`bar-bounce-card ${active === index ? 'is-active' : ''}`}
-                  style={{ '--fan-x': `${(index - 1.5) * 178}px`, '--fan-angle': `${(index - 1.5) * 8}deg`, '--card-index': index }}
+                  style={{ '--fan-x': `${(index - 1.5) * 178}px`, '--fan-angle': `${(index - 1.5) * 8}deg`, '--card-index': index, '--note-accent': item.color }}
                   aria-pressed={active === index}
                   onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)}
                   onClick={() => setActive(index)}>
                   <span className="bar-bounce-no">{item.number} / 04 <em>{item.color}</em></span>
                   <span className="bar-bounce-art" aria-hidden="true"><i /><i /><i /></span>
+                  <span className="bar-bounce-watermark" aria-hidden="true">{item.number}</span>
                   <span className="bar-bounce-copy"><small>{item.English}</small><strong>{item.title}</strong></span>
                 </button>
               ))}
             </div>
             <div className="bar-bounce-detail" aria-live="polite">
-              <span>{highlights[active].number} / {highlights[active].English}</span>
-              <p>{highlights[active].summary}</p>
-              <ul>{highlights[active].details.map(line => <li key={line}>{line}</li>)}</ul>
+              <div className="bar-bounce-index"><small>SELECTED NOTE</small><strong>{highlights[active].number}</strong><span>{highlights[active].English}</span></div>
+              <div className="bar-bounce-description"><h3>{highlights[active].title}</h3><p>{highlights[active].summary}</p>
+                <ul>{highlights[active].details.map(line => <li key={line}>{line}</li>)}</ul></div>
             </div>
             <p className="bar-highlights-hint">移入或点击卡片，查看内容</p>
             <div className="bar-story-footer">02 / 04 <span>SELECTED HIGHLIGHTS</span></div>
