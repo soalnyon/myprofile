@@ -7,25 +7,31 @@ const education = [
 
 const highlights = [
   {
-    number: '01', title: '公众号运营', English: 'EDITORIAL', color: '#F3CFA4',
+    number: '01', title: '公众号运营', English: 'EDITORIAL', color: '#F7AE88',
     summary: '把活动与品牌故事写成值得阅读的内容。',
     details: ['撰写活动推广、活动总结与节日类推文。', '独立策划内容逻辑和活动文案，提升用户黏性。'],
   },
   {
-    number: '02', title: '线下活动支持', English: 'IN PERSON', color: '#E9BDA6',
+    number: '02', title: '线下活动支持', English: 'IN PERSON', color: '#F5C39D',
     summary: '让每一次见面都有清晰、统一的表达。',
     details: ['支持校园开放日、主题讲座、咨询答疑会和展会的全流程执行。', '制作项目宣讲 PPT 与活动物料，参与线下活动 20 余场。'],
   },
   {
-    number: '03', title: '线上项目推广', English: 'DIGITAL', color: '#A9D8D6',
+    number: '03', title: '线上项目推广', English: 'DIGITAL', color: '#8BD6D1',
     summary: '从用户洞察出发，持续优化推广。',
     details: ['分析招生数据，形成学生画像。', '推广短信覆盖 6 万余用户，跟进广告投放并优化物料与投放机制。'],
   },
   {
-    number: '04', title: '内容策划', English: 'STORYTELLING', color: '#E6C19C',
+    number: '04', title: '内容策划', English: 'STORYTELLING', color: '#F6D07F',
     summary: '用内容连接活动、渠道与人。',
     details: ['策划年度内容主题、活动文案和广告文案。', '制作招生邮件模板等标准化材料，搭建内容模板与执行流程。'],
   },
+]
+
+const aboutNotes = [
+  { label: 'PERSPECTIVE', title: '跨学科视角', copy: '管理学与信息技术的跨学科背景，熟悉组织运营流程，善于整合资源并高效执行项目。' },
+  { label: 'CREATIVITY', title: '内容与创新', copy: '熟悉新媒体运营全流程，善用创新工具提升宣传创意与效率。' },
+  { label: 'COLLABORATION', title: '协作与成长', copy: '重视沟通、细节与执行，以数据优化推广策略，助力品牌增长与业务拓展。' },
 ]
 
 const posters = [
@@ -87,6 +93,8 @@ function CircularPosterCarousel() {
 
 export default function BarStories({ panel, onClose }) {
   const [active, setActive] = useState(0)
+  const [folderOpen, setFolderOpen] = useState(false)
+  const [activeNote, setActiveNote] = useState(0)
 
   useEffect(() => {
     const closeOnEscape = event => { if (event.key === 'Escape') onClose() }
@@ -162,10 +170,31 @@ export default function BarStories({ panel, onClose }) {
             <div className="bar-about-sun" aria-hidden="true" /><div className="bar-about-wave" aria-hidden="true"><i /><i /><i /></div>
             <p className="bar-story-eyebrow">ABOUT ME / 自我评价</p>
             <h2>Thoughtful ideas.<br /><em>Thoughtful execution.</em></h2>
-            <div className="bar-about-cards">
-              <div><span>01 / PERSPECTIVE</span><h3>跨学科视角</h3><p>管理学与信息技术的跨学科背景，熟悉组织运营流程，善于整合资源并高效执行项目。</p></div>
-              <div><span>02 / CREATIVITY</span><h3>内容与创新</h3><p>熟悉新媒体运营全流程，善用创新工具提升宣传创意与效率。</p></div>
-              <div><span>03 / COLLABORATION</span><h3>协作与成长</h3><p>重视沟通、细节与执行，以数据优化推广策略，助力品牌增长与业务拓展。</p></div>
+            <div className="bar-about-content">
+              <div className={`bar-folder ${folderOpen ? 'is-open' : ''}`} onMouseEnter={() => setFolderOpen(true)} onMouseLeave={() => setFolderOpen(false)}>
+                <div className="bar-folder-pages">
+                  {aboutNotes.map((note, index) => <button type="button" key={note.label}
+                    className={`bar-folder-page ${activeNote === index ? 'is-selected' : ''}`}
+                    onClick={() => { setFolderOpen(true); setActiveNote(index) }}
+                    aria-label={`查看${note.title}`} aria-hidden={!folderOpen} tabIndex={folderOpen ? 0 : -1}
+                    style={{ '--page-index': index }}>
+                    <span>0{index + 1}</span><strong>{note.title}</strong><small>{note.label}</small>
+                  </button>)}
+                </div>
+                <button type="button" className="bar-folder-cover" aria-expanded={folderOpen}
+                  aria-label={folderOpen ? '合上自我评价文件夹' : '打开自我评价文件夹'}
+                  onClick={event => setFolderOpen(value => event.nativeEvent.pointerType === 'mouse' ? true : !value)}>
+                  <span className="bar-folder-tab">PROFILE / 04</span>
+                  <span className="bar-folder-mark" aria-hidden="true">W·ZH</span>
+                  <span className="bar-folder-caption">FIELD NOTES <i>✦</i> COAST & STARS</span>
+                </button>
+              </div>
+              <div className="bar-folder-detail" aria-live="polite">
+                <span>0{activeNote + 1} / 03 · {aboutNotes[activeNote].label}</span>
+                <h3>{aboutNotes[activeNote].title}</h3>
+                <p>{aboutNotes[activeNote].copy}</p>
+                <small>打开文件夹，选一张纸页阅读</small>
+              </div>
             </div>
             <div className="bar-story-footer">04 / 04 <span>FROM THE SHORE, WITH PURPOSE</span></div>
           </div>

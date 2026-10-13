@@ -68,7 +68,7 @@ function CameraAnimator({ currentView, modelCenter, isMobile }) {
       const target = overview ? modelCenter : rotateWithModel(viewTarget);
       let position = overview ? viewPosition : rotateWithModel(viewPosition);
       if (isMobile) {
-        const distanceScale = overview ? 2.05 : currentView === 'thebar' ? 1.65 : 1.35;
+        const distanceScale = overview ? 1.9 : currentView === 'thebar' ? 1.65 : 1.35;
         position = position.map((coordinate, index) => target[index] + (coordinate - target[index]) * distanceScale);
       }
       // 开启平滑过渡 (true)

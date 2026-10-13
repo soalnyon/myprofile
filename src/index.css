@@ -897,3 +897,81 @@ button:hover {
 }
 @media (max-width: 360px) { .brand-block .poem { max-width: 150px; font-size: 7px; } }
 @media (prefers-reduced-motion: reduce) { .drink-magic, .resource-cv-float, .resource-cv-float::before { animation: none; } }
+
+/* Brighter coastal palette for the Highlights accordion. */
+.bar-story-highlights { background: linear-gradient(145deg, #fff9ec, #edf8ed); }
+.bar-accordion-panel { color: #214a4a; border-top-color: var(--panel-accent); box-shadow: 0 12px 28px rgba(56,111,106,.12); }
+.bar-accordion-panel:not(.is-active) { filter: none; }
+.bar-accordion-panel:nth-child(1) .bar-accordion-visual { background: radial-gradient(circle at 70% 20%, #fff2d2, transparent 44%), linear-gradient(145deg, #ffe3c8, #f6bb9d); }
+.bar-accordion-panel:nth-child(2) .bar-accordion-visual { background: radial-gradient(circle at 28% 24%, #fff4d4, transparent 43%), linear-gradient(145deg, #ffe3d4, #f2c4ae); }
+.bar-accordion-panel:nth-child(3) .bar-accordion-visual { background: radial-gradient(circle at 72% 19%, #effff5, transparent 44%), linear-gradient(145deg, #d1f2e7, #9fdce0); }
+.bar-accordion-panel:nth-child(4) .bar-accordion-visual { background: radial-gradient(circle at 58% 17%, #fffbea, transparent 45%), linear-gradient(145deg, #fff0c7, #f6d79b); }
+.bar-accordion-visual::after { background: linear-gradient(0deg, rgba(255,255,248,.47), transparent 66%); }
+.bar-accordion-visual i { border-color: rgba(255,255,255,.42); }
+.bar-accordion-number, .bar-accordion-number em { color: #52746f; }
+.bar-accordion-English { color: #557d78; }
+.bar-accordion-copy strong { color: #235352; text-shadow: none; }
+.bar-accordion-detail { color: #345e5a; }
+.bar-accordion-panel.is-active { box-shadow: 0 18px 38px rgba(53,112,108,.18); }
+
+/* Folder-inspired self evaluation: three notes rise from a paper pocket. */
+.bar-about h2 { margin-bottom: 12px; }
+.bar-about-content { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(0,.9fr); align-items: center; gap: 22px; flex: 1; min-height: 0; }
+.bar-folder { position: relative; width: min(100%, 330px); height: 275px; margin: 0 auto; perspective: 900px; }
+.bar-folder::before { content: ''; position: absolute; z-index: 0; left: 6%; right: 6%; bottom: 15px; height: 150px; border: 1px solid #d7b989; border-radius: 9px 9px 15px 15px; background: #f6dfb6; box-shadow: 0 22px 35px rgba(80,102,90,.17); }
+.bar-folder-pages { position: absolute; z-index: 1; inset: 0; }
+.bar-folder-page { position: absolute; left: 50%; top: 13px; display: flex; flex-direction: column; align-items: flex-start; width: 144px; height: 150px; padding: 15px; border: 1px solid rgba(91,133,124,.3); border-radius: 4px; color: #315956; background: #fffdf2; box-shadow: 0 8px 18px rgba(64,103,95,.16); text-align: left; opacity: .85; transform: translate(-50%,75px) rotate(0deg) scale(.85); transition: transform .55s cubic-bezier(.2,.85,.2,1), box-shadow .3s, opacity .3s; pointer-events: none; }
+.bar-folder-page:nth-child(2) { background: #e5f2e8; }
+.bar-folder-page:nth-child(3) { background: #fce9db; }
+.bar-folder.is-open .bar-folder-page { opacity: 1; pointer-events: auto; }
+.bar-folder.is-open .bar-folder-page:nth-child(1) { transform: translate(calc(-50% - 82px),-4px) rotate(-13deg); }
+.bar-folder.is-open .bar-folder-page:nth-child(2) { transform: translate(-50%,-31px) rotate(0deg); }
+.bar-folder.is-open .bar-folder-page:nth-child(3) { transform: translate(calc(-50% + 82px),-4px) rotate(13deg); }
+.bar-folder-page:hover, .bar-folder-page:focus-visible { box-shadow: 0 12px 25px rgba(54,105,99,.26); outline: 2px solid #85c9bd; outline-offset: -2px; }
+.bar-folder-page span { color: #bd9b75; font: 10px Arial, sans-serif; letter-spacing: .15em; }
+.bar-folder-page strong { margin-top: 30px; font-size: 16px; font-weight: 400; }
+.bar-folder-page small { margin-top: 5px; color: #849b91; font: 8px Arial, sans-serif; letter-spacing: .1em; }
+.bar-folder-cover { position: absolute; z-index: 2; left: 2%; right: 2%; bottom: 12px; height: 142px; padding: 21px; border: 1px solid #dcbb8e; border-radius: 6px 14px 13px 13px; color: #416960; background: linear-gradient(140deg, #ffe7bd, #f1d09f); box-shadow: inset 0 1px #fff5df, 0 13px 24px rgba(99,85,62,.17); text-align: left; transform-origin: bottom center; transition: transform .55s cubic-bezier(.2,.85,.2,1), box-shadow .4s; }
+.bar-folder-cover::before { content: ''; position: absolute; left: -1px; top: -15px; width: 38%; height: 20px; border: 1px solid #dcbb8e; border-bottom: 0; border-radius: 8px 12px 0 0; background: #ffe7bd; }
+.bar-folder.is-open .bar-folder-cover { transform: rotateX(-18deg) translateY(17px); box-shadow: inset 0 1px #fff5df, 0 20px 29px rgba(99,85,62,.2); }
+.bar-folder-tab { position: relative; display: block; color: #a27c5b; font: 9px Arial, sans-serif; letter-spacing: .17em; }
+.bar-folder-mark { display: block; margin: 14px 0 12px; font-size: 31px; letter-spacing: -.06em; }
+.bar-folder-caption { color: #9b856d; font: 8px Arial, sans-serif; letter-spacing: .16em; }
+.bar-folder-caption i { padding: 0 5px; color: #d6a061; font-style: normal; }
+.bar-folder-detail { align-self: center; padding: 24px 0 24px 22px; border-left: 1px solid #bfd2c6; }
+.bar-folder-detail > span { color: #ad8b6a; font: 10px Arial, sans-serif; letter-spacing: .16em; }
+.bar-folder-detail h3 { margin: 18px 0 12px; color: #2f5e57; font-size: clamp(22px, 3vw, 30px); font-weight: 400; }
+.bar-folder-detail p { max-width: 270px; margin: 0; color: #5a7b72; font: 12px/1.75 Arial, sans-serif; }
+.bar-folder-detail small { display: block; margin-top: 22px; color: #a2b4a3; font: 10px Arial, sans-serif; letter-spacing: .1em; }
+
+/* Practice stays secondary to the work card, with a quieter timeline. */
+.voyage-practice h3 { margin: 13px 0 14px; color: #3c685e; font-size: clamp(20px, 2.5vw, 27px); }
+.voyage-practice h3 small { display: inline; margin-left: 12px; font-size: .48em; letter-spacing: .08em; }
+.voyage-practice-copy { position: relative; border-left: 1px solid rgba(92,146,130,.3); margin-left: 5px; }
+.voyage-practice-copy section { position: relative; padding: 10px 13px 11px 18px; margin: 0 0 9px 12px; border: 1px solid rgba(92,146,130,.17); border-radius: 2px; background: rgba(255,255,251,.4); }
+.voyage-practice-copy section::before { content: ''; position: absolute; left: -21px; top: 15px; width: 6px; height: 6px; border-radius: 50%; background: #cda477; box-shadow: 0 0 0 3px #f7f2e6; }
+.voyage-practice-copy time, .voyage-practice-copy em { color: #a28569; font: 9px Arial, sans-serif; letter-spacing: .08em; }
+.voyage-practice-copy h4 { margin: 6px 0 4px; color: #315f58; font-size: 15px; font-weight: 400; }
+.voyage-practice-copy p { margin: 5px 0 0; color: #607b71; font: 10.5px/1.6 Arial, sans-serif; }
+
+@media (max-width: 700px) {
+  .bar-about h2 { margin: 9px 0 0; font-size: clamp(27px, 8vw, 37px); }
+  .bar-about-content { grid-template-columns: 1fr; align-content: start; gap: 0; padding-top: 46px; }
+  .bar-folder { width: min(100%, 270px); height: 230px; }
+  .bar-folder::before { height: 125px; }
+  .bar-folder-cover { height: 120px; padding: 16px; }
+  .bar-folder-mark { margin: 9px 0; font-size: 25px; }
+  .bar-folder-page { width: 115px; height: 128px; padding: 11px; }
+  .bar-folder-page strong { margin-top: 25px; font-size: 13px; }
+  .bar-folder.is-open .bar-folder-page:nth-child(1) { transform: translate(calc(-50% - 62px),-2px) rotate(-12deg); }
+  .bar-folder.is-open .bar-folder-page:nth-child(3) { transform: translate(calc(-50% + 62px),-2px) rotate(12deg); }
+  .bar-folder-detail { padding: 9px 0 0; border-left: 0; border-top: 1px solid #bfd2c6; }
+  .bar-folder-detail h3 { margin: 5px 0; font-size: 18px; }
+  .bar-folder-detail p { max-width: none; font-size: 10px; line-height: 1.5; }
+  .bar-folder-detail small { display: none; }
+  .voyage-practice h3 { margin: 9px 0 11px; font-size: 20px; }
+  .voyage-practice-copy section { padding: 7px 8px 8px 12px; margin-bottom: 7px; }
+  .voyage-practice-copy h4 { font-size: 13px; }
+  .voyage-practice-copy p { font-size: 9.5px; line-height: 1.5; }
+}
+@media (prefers-reduced-motion: reduce) { .bar-folder-cover, .bar-folder-page { transition: none; } }
