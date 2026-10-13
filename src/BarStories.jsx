@@ -39,6 +39,53 @@ const posters = [
   ...Array.from({ length: 5 }, (_, index) => ({ src: `/poster-previews/入口图${index + 1}.webp`, full: `/poster-full/入口图${index + 1}.webp`, shape: 'landscape' })),
 ]
 
+function ProfileLanyard() {
+  const [flipped, setFlipped] = useState(false)
+  const [pose, setPose] = useState({ x: 0, y: 0, dx: 0, dy: 0 })
+  const pointer = useRef(null)
+  const dragged = useRef(false)
+
+  return <div className="profile-lanyard-stage">
+    <div className="profile-lanyard" style={{ '--lanyard-x': `${pose.x}deg`, '--lanyard-y': `${pose.y}deg`, '--lanyard-dx': `${pose.dx}px`, '--lanyard-dy': `${pose.dy}px` }}>
+      <div className="profile-lanyard-cord" aria-hidden="true"><i /><i /></div>
+      <button type="button" className={`profile-lanyard-badge ${flipped ? 'is-flipped' : ''}`}
+        aria-label={flipped ? '翻回个人资料正面' : '翻看个人资料背面'}
+        onPointerDown={event => {
+          pointer.current = { x: event.clientX, y: event.clientY }
+          dragged.current = false
+          event.currentTarget.setPointerCapture(event.pointerId)
+        }}
+        onPointerMove={event => {
+          if (!pointer.current) return
+          const dx = event.clientX - pointer.current.x
+          const dy = event.clientY - pointer.current.y
+          if (Math.abs(dx) + Math.abs(dy) > 8) dragged.current = true
+          setPose({ x: Math.max(-17, Math.min(17, dx * .13)), y: Math.max(-12, Math.min(12, -dy * .12)),
+            dx: Math.max(-42, Math.min(42, dx * .36)), dy: Math.max(-22, Math.min(44, dy * .36)) })
+        }}
+        onPointerUp={() => { pointer.current = null; setPose({ x: 0, y: 0, dx: 0, dy: 0 }) }}
+        onPointerCancel={() => { pointer.current = null; setPose({ x: 0, y: 0, dx: 0, dy: 0 }) }}
+        onClick={() => {
+          if (dragged.current) { dragged.current = false; return }
+          setFlipped(value => !value)
+        }}>
+        <span className="profile-lanyard-face profile-lanyard-front">
+          <span className="profile-lanyard-top">COAST & STARS <span>01 / PROFILE</span></span>
+          <span className="profile-lanyard-identity"><span className="profile-lanyard-monogram">W·ZH</span><span><small>A LITTLE INTRODUCTION</small><strong>王子涵</strong><em>26 岁 · 内容运营 / 活动执行 / 增长推广</em></span></span>
+          <span className="profile-lanyard-bottom">K Y M B E R <span>✦</span> TURN TO DISCOVER</span>
+        </span>
+        <span className="profile-lanyard-face profile-lanyard-back">
+          <span className="profile-lanyard-top">FIELD NOTES <span>WZH / 2026</span></span>
+          <strong>Curiosity meets craft.</strong>
+          <span>以内容连接人和项目，以设计与数据让想法落地。</span>
+          <small>COAST & STARS · TURN TO RETURN</small>
+        </span>
+      </button>
+    </div>
+    <p>拖动吊牌，轻点翻面</p>
+  </div>
+}
+
 function CircularPosterCarousel() {
   const [zoomed, setZoomed] = useState(null)
   const ring = useRef(null)
@@ -111,10 +158,7 @@ export default function BarStories({ panel, onClose }) {
         <div className="bar-story-topline"><span>THE BAR · COAST & STARS</span><span>WZH / PORTFOLIO</span></div>
         {panel === 'profile' ? (
           <div className="bar-profile">
-            <div className="bar-profile-hero">
-              <div className="bar-profile-monogram" aria-hidden="true">W<span>·</span>ZH</div>
-              <div><p className="bar-story-eyebrow">A LITTLE INTRODUCTION</p><h2>王子涵</h2><p>26 岁 <span className="bar-profile-separator">/</span> 内容运营 · 活动执行 · 增长推广</p></div>
-            </div>
+            <ProfileLanyard />
             <div className="bar-profile-contact">
               <a href="tel:18451037068"><span>PHONE</span>184 5103 7068</a>
               <a href="mailto:wzh139628@gmail.com"><span>EMAIL</span>wzh139628@gmail.com</a>
@@ -131,25 +175,26 @@ export default function BarStories({ panel, onClose }) {
           <div className="bar-highlights">
             <p className="bar-story-eyebrow">A FEW THINGS I DO</p>
             <h2>Highlights<span> — 跨平台、多渠道的内容策划与落地</span></h2>
-            <div className="bar-accordion" aria-label="四项工作亮点">
+            <div className="bar-bounce-stage" aria-label="四项工作亮点">
               {highlights.map((item, index) => (
                 <button type="button" key={item.number}
-                  className={`bar-accordion-panel ${active === index ? 'is-active' : ''}`}
-                  style={{ '--panel-index': index, '--panel-accent': item.color }}
-                  aria-expanded={active === index}
+                  className={`bar-bounce-card ${active === index ? 'is-active' : ''}`}
+                  style={{ '--fan-x': `${(index - 1.5) * 205}px`, '--fan-angle': `${(index - 1.5) * 8}deg`, '--card-index': index }}
+                  aria-pressed={active === index}
                   onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)}
                   onClick={() => setActive(index)}>
-                  <span className="bar-accordion-visual" aria-hidden="true"><i /><i /><i /></span>
-                  <span className="bar-accordion-number">{item.number} / 04 <em>{item.color}</em></span>
-                  <span className="bar-accordion-copy">
-                    <span className="bar-accordion-English">{item.English}</span>
-                    <strong>{item.title}</strong>
-                    <span className="bar-accordion-detail"><span>{item.summary}</span>{item.details.map(line => <span key={line}>{line}</span>)}</span>
-                  </span>
+                  <span className="bar-bounce-no">{item.number} / 04 <em>{item.color}</em></span>
+                  <span className="bar-bounce-art" aria-hidden="true"><i /><i /><i /></span>
+                  <span className="bar-bounce-copy"><small>{item.English}</small><strong>{item.title}</strong></span>
                 </button>
               ))}
             </div>
-            <p className="bar-highlights-hint">移入或点击卡片，展开内容</p>
+            <div className="bar-bounce-detail" aria-live="polite">
+              <span>{highlights[active].number} / {highlights[active].English}</span>
+              <p>{highlights[active].summary}</p>
+              <ul>{highlights[active].details.map(line => <li key={line}>{line}</li>)}</ul>
+            </div>
+            <p className="bar-highlights-hint">移入或点击卡片，查看内容</p>
             <div className="bar-story-footer">02 / 04 <span>SELECTED HIGHLIGHTS</span></div>
           </div>
         ) : panel === 'posters' ? (

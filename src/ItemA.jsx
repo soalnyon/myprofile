@@ -71,6 +71,42 @@ function AnimatedFeatureNode({ node, currentView, onInteract, motion, interactio
   </group>
 }
 
+function AnimatedPostcardNode({ node, currentView, onInteract, motion, interactionProps }) {
+  const floating = useRef()
+  const started = useRef(-100)
+  const lastToken = useRef(0)
+
+  useFrame(({ clock }) => {
+    if (!floating.current) return
+    if (motion.token !== lastToken.current) {
+      lastToken.current = motion.token
+      started.current = clock.elapsedTime
+    }
+    const progress = Math.min(1, Math.max(0, (clock.elapsedTime - started.current) / 1.3))
+    const rise = progress < .67 ? Math.sin(progress / .67 * Math.PI / 2)
+      : Math.cos((progress - .67) / .33 * Math.PI / 2)
+    floating.current.position.y = .78 * rise
+    floating.current.rotation.y = .2 * rise
+    floating.current.rotation.z = -.13 * rise
+    floating.current.scale.setScalar(1 + .33 * rise)
+  })
+
+  return <group name={node.name} position={node.position} scale={node.scale}>
+    <group ref={floating}>
+      <group quaternion={node.quaternion}>
+        {node.isMesh && <mesh geometry={node.geometry} material={node.material}
+          onClick={event => { event.stopPropagation(); onInteract('postcard') }}
+          onPointerOver={event => { event.stopPropagation(); document.body.style.cursor = 'pointer' }}
+          onPointerOut={() => { document.body.style.cursor = 'auto' }} />}
+        {node.children.map(child => <ModelNode key={child.uuid} node={child} currentView={currentView}
+          onInteract={onInteract} {...interactionProps} inheritedInteraction="postcard" />)}
+        {currentView === 'beach' && <InteractionHint label="Read the postcard"
+          onClick={() => onInteract('postcard')} />}
+      </group>
+    </group>
+  </group>
+}
+
 function WaterClickRipple({ ripple }) {
   const rings = useRef([])
   const started = useRef(null)
@@ -231,13 +267,13 @@ function interactionFor(name) {
 // transforms survive future model revisions without hard-coded coordinates.
 function ModelNode({ node, currentView, onInteract, isDay, lampMaterial,
   onBoatAction, boatToken, onCoconutAction, coconutToken, coconutRunning,
-  onWaterRipple, waterRipple, featureMotion,
+  onWaterRipple, waterRipple, featureMotion, postcardMotion,
   inheritedInteraction = null, inheritedWater = null }) {
   // Keep lighting owned by App's existing day/night setup.
   if (node.isLight || node.isCamera) return null
 
   const interactionProps = { isDay, lampMaterial, onBoatAction, boatToken,
-    onCoconutAction, coconutToken, coconutRunning, onWaterRipple, waterRipple, featureMotion }
+    onCoconutAction, coconutToken, coconutRunning, onWaterRipple, waterRipple, featureMotion, postcardMotion }
   if (node.name === 'BoatMotionRoot') {
     return <BoatMotion node={node} currentView={currentView} onInteract={onInteract}
       {...interactionProps} />
@@ -249,6 +285,10 @@ function ModelNode({ node, currentView, onInteract, isDay, lampMaterial,
   if (DRINK_NAMES.has(node.name) || node.name === 'Telescope') {
     return <AnimatedFeatureNode node={node} currentView={currentView} onInteract={onInteract}
       motion={featureMotion} interactionProps={interactionProps} />
+  }
+  if (node.name === 'Postcard') {
+    return <AnimatedPostcardNode node={node} currentView={currentView} onInteract={onInteract}
+      motion={postcardMotion} interactionProps={interactionProps} />
   }
 
   const drinkPanel = currentView === 'thebar'
@@ -301,9 +341,6 @@ function ModelNode({ node, currentView, onInteract, isDay, lampMaterial,
           onInteract={onInteract} {...interactionProps}
           inheritedInteraction={interaction} inheritedWater={water} />
       ))}
-      {node.name === 'Postcard' && currentView === 'beach' && (
-        <InteractionHint label="Read the postcard" onClick={() => onInteract('postcard')} />
-      )}
       {node.name === 'Boat' && currentView === 'boat' && (
         <InteractionHint label="Set the boat adrift" position={[0, -0.58, 0]} onClick={onBoatAction} />
       )}
@@ -326,6 +363,7 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
   const [coconutRunning, setCoconutRunning] = useState(false)
   const [waterRipple, setWaterRipple] = useState(null)
   const [featureMotion, setFeatureMotion] = useState({ name: null, token: 0 })
+  const [postcardMotion, setPostcardMotion] = useState({ token: 0 })
   const journeyTimer = useRef(null)
   const resourcesTimer = useRef(null)
   const featureTimer = useRef(null)
@@ -366,7 +404,11 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
       window.clearTimeout(featureTimer.current)
       featureTimer.current = window.setTimeout(() => setDrinkPanel?.(interaction), 900)
     } else if (interaction === 'postcard') {
-      if (currentView === 'beach') setShowPostcard?.(true)
+      if (currentView === 'beach') {
+        setPostcardMotion(value => ({ token: value.token + 1 }))
+        window.clearTimeout(featureTimer.current)
+        featureTimer.current = window.setTimeout(() => setShowPostcard?.(true), 820)
+      }
       else setCurrentView?.('beach')
     } else {
       setCurrentView?.(interaction)
@@ -376,7 +418,7 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
   return (
     <group ref={group} {...props} dispose={null}>
       <ModelNode node={scene} currentView={currentView} onInteract={handleInteraction}
-        isDay={isDay} lampMaterial={lampMaterial} featureMotion={featureMotion}
+        isDay={isDay} lampMaterial={lampMaterial} featureMotion={featureMotion} postcardMotion={postcardMotion}
         onBoatAction={() => {
           onInteractionSound?.()
           setBoatToken(value => value + 1)

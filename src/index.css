@@ -975,3 +975,88 @@ button:hover {
   .voyage-practice-copy p { font-size: 9.5px; line-height: 1.5; }
 }
 @media (prefers-reduced-motion: reduce) { .bar-folder-cover, .bar-folder-page { transition: none; } }
+
+/* A light, draggable ID badge inspired by the Lanyard interaction. */
+.profile-lanyard-stage { flex: none; display: grid; justify-items: center; height: 222px; padding-top: 2px; }
+.profile-lanyard-stage > p { margin: 4px 0 0; color: #9eaa9a; font: 9px Arial, sans-serif; letter-spacing: .18em; }
+.profile-lanyard { position: relative; width: min(100%, 390px); height: 190px; transform: translate(var(--lanyard-dx), var(--lanyard-dy)) rotateZ(var(--lanyard-x)) rotateX(var(--lanyard-y)); transition: transform .7s cubic-bezier(.18,1.35,.35,1); transform-origin: 50% 0; }
+.profile-lanyard:has(.profile-lanyard-badge:active) { transition-duration: .08s; }
+.profile-lanyard-cord { position: absolute; top: -35px; left: 50%; width: 102px; height: 78px; transform: translateX(-50%); pointer-events: none; }
+.profile-lanyard-cord i { position: absolute; top: 0; width: 8px; height: 76px; border: 1px solid #c8b18b; border-radius: 8px; background: repeating-linear-gradient(90deg, #eee0bd 0 2px, #d6bd92 2px 4px); box-shadow: 1px 1px 3px rgba(67,91,76,.16); }
+.profile-lanyard-cord i:first-child { left: 21px; transform: rotate(-27deg); transform-origin: top; }
+.profile-lanyard-cord i:last-child { right: 21px; transform: rotate(27deg); transform-origin: top; }
+.profile-lanyard-badge { position: absolute; top: 38px; left: 50%; width: min(100%, 390px); height: 150px; padding: 0; border: 0; background: none; perspective: 1000px; transform: translateX(-50%); cursor: grab; touch-action: none; }
+.profile-lanyard-badge:active { cursor: grabbing; }
+.profile-lanyard-badge::before { content: ''; position: absolute; z-index: 4; top: 8px; left: 50%; width: 36px; height: 8px; border: 2px solid rgba(66,103,94,.24); border-radius: 8px; transform: translateX(-50%); pointer-events: none; }
+.profile-lanyard-face { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 22px 25px 14px; border: 1px solid #c6d5c5; border-radius: 12px; color: #2a5550; background: radial-gradient(circle at 95% 10%, rgba(238,205,146,.27), transparent 30%), linear-gradient(145deg, #fffdf4, #eaf1e8); box-shadow: 0 15px 31px rgba(39,84,75,.18), inset 0 0 0 5px rgba(255,255,255,.6); backface-visibility: hidden; transition: transform .7s cubic-bezier(.2,.8,.2,1); }
+.profile-lanyard-front { transform: rotateY(0deg); }
+.profile-lanyard-back { align-items: flex-start; transform: rotateY(-180deg); }
+.profile-lanyard-badge.is-flipped .profile-lanyard-front { transform: rotateY(180deg); }
+.profile-lanyard-badge.is-flipped .profile-lanyard-back { transform: rotateY(0deg); }
+.profile-lanyard-top, .profile-lanyard-bottom { display: flex; justify-content: space-between; width: 100%; color: #8f9f8c; font: 8px Arial, sans-serif; letter-spacing: .18em; }
+.profile-lanyard-identity { display: flex; align-items: center; gap: 15px; flex: 1; }
+.profile-lanyard-monogram { display: grid; flex: none; place-items: center; width: 63px; height: 63px; border: 1px solid #b3c8b8; border-radius: 50%; color: #446d61; background: #f5f5e8; font-size: 15px; }
+.profile-lanyard-identity > span:last-child { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.profile-lanyard-identity small { color: #ad8c6c; font: 8px Arial, sans-serif; letter-spacing: .15em; }
+.profile-lanyard-identity strong { font-size: 25px; font-weight: 400; letter-spacing: .08em; }
+.profile-lanyard-identity em { color: #6f8d83; font: 10px Arial, sans-serif; }
+.profile-lanyard-bottom span { color: #cfab78; }
+.profile-lanyard-back > strong { margin: auto 0 7px; font-size: 26px; font-weight: 400; }
+.profile-lanyard-back > span:nth-child(3) { color: #6c8b81; font: 11px Arial, sans-serif; }
+.profile-lanyard-back > small { margin-top: auto; color: #9daa99; font: 8px Arial, sans-serif; letter-spacing: .16em; }
+
+/* Muted sand and sea-glass Bounce Cards replace the accordion. */
+.bar-story-highlights { background: linear-gradient(145deg, #fbf8ed, #edf2e7); }
+.bar-bounce-stage { position: relative; flex: 1; min-height: 265px; margin: 7px 0 0; perspective: 900px; }
+.bar-bounce-card { position: absolute; top: 20px; left: 50%; width: 235px; height: min(31vh, 255px); min-height: 220px; overflow: hidden; padding: 18px; border: 1px solid #c1d0bf; border-radius: 7px; color: #315d54; background: linear-gradient(145deg, #f6f1df, #e7ede0); box-shadow: 0 15px 30px rgba(48,92,81,.16); text-align: left; transform: translateX(calc(-50% + var(--fan-x))) translateY(16px) rotate(var(--fan-angle)); transform-origin: center bottom; animation: bar-card-bounce .8s cubic-bezier(.17,1.25,.35,1) calc(var(--card-index) * 95ms) both; transition: transform .55s cubic-bezier(.16,1.3,.35,1), box-shadow .35s; }
+.bar-bounce-card:nth-child(2) { background: linear-gradient(145deg, #f8f3e4, #e9ecdf); }
+.bar-bounce-card:nth-child(3) { background: linear-gradient(145deg, #edf4e8, #dcebe3); }
+.bar-bounce-card:nth-child(4) { background: linear-gradient(145deg, #fbf5e6, #e9ecdc); }
+.bar-bounce-card.is-active, .bar-bounce-card:hover, .bar-bounce-card:focus-visible { z-index: 5; outline: none; box-shadow: 0 23px 38px rgba(43,91,79,.25); transform: translateX(calc(-50% + var(--fan-x))) translateY(-8px) rotate(0deg) scale(1.045); }
+@keyframes bar-card-bounce { from { opacity: 0; translate: 0 95px; scale: .8; } 65% { opacity: 1; translate: 0 -12px; scale: 1.025; } to { opacity: 1; translate: 0 0; scale: 1; } }
+.bar-bounce-no { position: relative; z-index: 1; display: flex; justify-content: space-between; color: #8b9e89; font: 9px Arial, sans-serif; letter-spacing: .15em; }
+.bar-bounce-no em { color: #a4997e; font-style: normal; }
+.bar-bounce-art { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.bar-bounce-art i { position: absolute; left: 15%; top: 20%; width: 72%; height: 68%; border: 1px solid rgba(86,145,132,.2); border-radius: 50%; transform: rotate(-25deg); }
+.bar-bounce-art i:nth-child(2) { left: 34%; top: 5%; width: 80%; height: 85%; }
+.bar-bounce-art i:nth-child(3) { left: -27%; top: 37%; width: 100%; height: 48%; }
+.bar-bounce-copy { position: absolute; z-index: 1; right: 18px; bottom: 22px; left: 18px; display: flex; flex-direction: column; gap: 8px; }
+.bar-bounce-copy small { color: #8ba597; font: 9px Arial, sans-serif; letter-spacing: .2em; }
+.bar-bounce-copy strong { font-size: 24px; font-weight: 400; white-space: nowrap; }
+.bar-bounce-detail { display: grid; grid-template-columns: 170px 1fr; gap: 4px 16px; min-height: 108px; padding: 15px 18px; border: 1px solid #d5dfcf; color: #496c62; background: rgba(255,255,247,.58); }
+.bar-bounce-detail > span { grid-row: span 2; color: #9b9e86; font: 9px Arial, sans-serif; letter-spacing: .15em; }
+.bar-bounce-detail p { margin: 0; font: 12px/1.45 Arial, sans-serif; }
+.bar-bounce-detail ul { display: grid; gap: 3px; margin: 0; padding-left: 17px; font: 11px/1.4 Arial, sans-serif; }
+.bar-highlights-hint { margin: 8px 0 9px; }
+
+/* The scene postcard rises first; its paper page then unfolds into view. */
+.postcard-overlay { animation: overlay-in .65s ease-out both; }
+.postcard-sheet { animation: postcard-unfold .82s cubic-bezier(.19,.9,.24,1) both; }
+@keyframes postcard-unfold { from { opacity: 0; transform: perspective(900px) translateY(24vh) scale(.2) rotateX(72deg) rotateY(-22deg) rotate(-12deg); } 55% { opacity: 1; } to { opacity: 1; transform: perspective(900px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) rotate(-1.5deg); } }
+
+@media (max-width: 700px) {
+  .profile-lanyard-stage { height: 182px; }
+  .profile-lanyard { width: min(100%, 315px); height: 154px; }
+  .profile-lanyard-cord { top: -28px; height: 61px; }
+  .profile-lanyard-cord i { height: 57px; }
+  .profile-lanyard-badge { top: 27px; width: 100%; height: 116px; }
+  .profile-lanyard-face { padding: 16px 16px 10px; }
+  .profile-lanyard-monogram { width: 45px; height: 45px; font-size: 11px; }
+  .profile-lanyard-identity { gap: 9px; }
+  .profile-lanyard-identity strong { font-size: 20px; }
+  .profile-lanyard-identity em { font-size: 8px; }
+  .profile-lanyard-top, .profile-lanyard-bottom, .profile-lanyard-identity small { font-size: 7px; }
+  .profile-lanyard-back > strong { font-size: 21px; }
+  .profile-lanyard-back > span:nth-child(3) { font-size: 9px; }
+  .bar-bounce-stage { display: grid; flex: none; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; min-height: 0; margin-top: 10px; }
+  .bar-bounce-card { position: relative; top: auto; left: auto; width: auto; height: 116px; min-height: 0; padding: 11px; transform: rotate(var(--fan-angle)); }
+  .bar-bounce-card.is-active, .bar-bounce-card:hover, .bar-bounce-card:focus-visible { transform: translateY(-4px) rotate(0deg) scale(1.02); }
+  .bar-bounce-copy { right: 10px; bottom: 11px; left: 10px; gap: 3px; }
+  .bar-bounce-copy strong { font-size: 15px; }
+  .bar-bounce-copy small, .bar-bounce-no { font-size: 7px; }
+  .bar-bounce-detail { grid-template-columns: 1fr; min-height: 126px; gap: 5px; margin-top: 9px; padding: 10px 11px; }
+  .bar-bounce-detail > span { grid-row: auto; }
+  .bar-bounce-detail p { font-size: 10px; }
+  .bar-bounce-detail ul { font-size: 9px; line-height: 1.35; }
+}
+@media (prefers-reduced-motion: reduce) { .bar-bounce-card, .postcard-sheet { animation: none; } .profile-lanyard, .profile-lanyard-face, .bar-bounce-card { transition: none; } }
