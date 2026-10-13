@@ -158,10 +158,13 @@ export default function BarStories({ panel, onClose }) {
         <div className="bar-story-topline"><span>THE BAR · COAST & STARS</span><span>WZH / PORTFOLIO</span></div>
         {panel === 'profile' ? (
           <div className="bar-profile">
-            <ProfileLanyard />
-            <div className="bar-profile-contact">
-              <a href="tel:18451037068"><span>PHONE</span>184 5103 7068</a>
-              <a href="mailto:wzh139628@gmail.com"><span>EMAIL</span>wzh139628@gmail.com</a>
+            <div className="bar-profile-top">
+              <ProfileLanyard />
+              <div className="bar-profile-contact">
+                <p className="bar-profile-note">A little note from the coast <span aria-hidden="true">✳</span></p>
+                <a href="tel:18451037068"><span>PHONE</span>184 5103 7068</a>
+                <a href="mailto:wzh139628@gmail.com"><span>EMAIL</span>wzh139628@gmail.com</a>
+              </div>
             </div>
             <div className="bar-profile-education">
               <p className="bar-story-eyebrow">EDUCATION / 教育经历</p>
@@ -179,12 +182,12 @@ export default function BarStories({ panel, onClose }) {
               {highlights.map((item, index) => (
                 <button type="button" key={item.number}
                   className={`bar-bounce-card ${active === index ? 'is-active' : ''}`}
-                  style={{ '--fan-x': `${(index - 1.5) * 205}px`, '--fan-angle': `${(index - 1.5) * 8}deg`, '--card-index': index }}
+                  style={{ '--fan-x': `${(index - 1.5) * 178}px`, '--fan-angle': `${(index - 1.5) * 8}deg`, '--card-index': index }}
                   aria-pressed={active === index}
                   onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)}
                   onClick={() => setActive(index)}>
                   <span className="bar-bounce-no">{item.number} / 04 <em>{item.color}</em></span>
-                  <span className="bar-bounce-art" aria-hidden="true"><i /><i /><i /></span>
+                  <span className="bar-bounce-art" aria-hidden="true"><i /><i /><i /><b>✳</b></span>
                   <span className="bar-bounce-copy"><small>{item.English}</small><strong>{item.title}</strong></span>
                 </button>
               ))}

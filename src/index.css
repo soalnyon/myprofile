@@ -1060,3 +1060,55 @@ button:hover {
   .bar-bounce-detail ul { font-size: 9px; line-height: 1.35; }
 }
 @media (prefers-reduced-motion: reduce) { .bar-bounce-card, .postcard-sheet { animation: none; } .profile-lanyard, .profile-lanyard-face, .bar-bounce-card { transition: none; } }
+
+/* Compact editorial layout for the first three drinks. */
+@media (min-width: 701px) {
+  .bar-story-profile { width: min(690px, 100%); height: min(525px, calc(100dvh - 28px)); }
+  .bar-profile-top { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(185px, .85fr); align-items: center; gap: 14px; padding: 8px 0 5px; }
+  .bar-profile-top .profile-lanyard-stage { width: 100%; height: 190px; justify-items: start; }
+  .bar-profile-top .profile-lanyard { width: 100%; height: 168px; }
+  .bar-profile-top .profile-lanyard-badge { width: 100%; height: 125px; top: 33px; }
+  .bar-profile-top .profile-lanyard-face { padding: 18px 17px 11px; }
+  .bar-profile-top .profile-lanyard-monogram { width: 50px; height: 50px; font-size: 12px; }
+  .bar-profile-top .profile-lanyard-identity { gap: 10px; }
+  .bar-profile-top .profile-lanyard-identity strong { font-size: 20px; }
+  .bar-profile-top .profile-lanyard-identity em { font-size: 8px; }
+  .bar-profile-top .profile-lanyard-back > strong { font-size: 22px; }
+  .bar-profile-top .profile-lanyard-back > span:nth-child(3) { font-size: 9px; }
+  .bar-profile-top .profile-lanyard-stage > p { justify-self: center; }
+  .bar-profile-top .bar-profile-contact { display: flex; flex-direction: column; gap: 7px; align-self: center; margin: 0; }
+  .bar-profile-note { display: flex; align-items: center; justify-content: space-between; margin: 0 0 3px; color: #ae886b; font: italic 12px Georgia, serif; }
+  .bar-profile-note span { color: #ccaa75; font: 19px Georgia, serif; }
+  .bar-profile-top .bar-profile-contact a { padding: 10px 11px; font-size: 11px; }
+  .bar-story-highlights { width: min(865px, 100%); height: min(620px, calc(100dvh - 28px)); }
+  .bar-bounce-card { width: 207px; }
+  .bar-story-posters { width: min(875px, 100%); }
+  .bar-story-posters .poster-carousel-stage { --poster-ring-radius: 310px; }
+}
+@keyframes lanyard-arrive { 0% { opacity: 0; translate: -32px -125px; scale: .55; rotate: -14deg; } 62% { opacity: 1; translate: 7px 16px; scale: 1.07; rotate: 4deg; } 82% { translate: -3px -5px; scale: .98; rotate: -2deg; } 100% { opacity: 1; translate: 0 0; scale: 1; rotate: 0deg; } }
+.profile-lanyard-stage { animation: lanyard-arrive .95s cubic-bezier(.22,.85,.3,1) both; transform-origin: 50% 0; }
+.bar-profile-top .profile-lanyard-cord { top: -31px; }
+.bar-profile-top .profile-lanyard-cord i { height: 65px; }
+.bar-profile-top .profile-lanyard-stage > p { margin-top: 0; }
+.bar-profile-education { padding-top: 10px; }
+.bar-profile-education .bar-education-row { padding-top: 10px; padding-bottom: 10px; }
+.bar-profile-education .bar-education-row::before { top: 14px; }
+.bar-bounce-card, .bar-bounce-card:nth-child(n) { background: linear-gradient(152deg, #fbf8ec 5%, #e7eee4 100%); border-color: #ced8c8; }
+.bar-bounce-card.is-active, .bar-bounce-card.is-active:nth-child(n) { color: #214e4e; background: radial-gradient(circle at 75% 22%, #fff5d4, transparent 34%), linear-gradient(150deg, #d4ebe3, #aad5c9); border-color: #89b4a9; }
+.bar-bounce-card::after { content: ''; position: absolute; left: 18px; right: 18px; bottom: 82px; height: 1px; background: linear-gradient(90deg, #9bbfb0, transparent); }
+.bar-bounce-card.is-active::after { background: linear-gradient(90deg, #4d988f, transparent); }
+.bar-bounce-no em { color: #ad9879; }
+.bar-bounce-card.is-active .bar-bounce-no em { color: #398579; }
+.bar-bounce-art b { position: absolute; top: 32%; left: 42%; color: rgba(180,155,108,.28); font: 75px Georgia, serif; font-weight: 400; }
+.bar-bounce-card.is-active .bar-bounce-art b { color: rgba(255,255,255,.6); transform: rotate(18deg); }
+.bar-bounce-card.is-active .bar-bounce-copy small { color: #558f83; }
+.bar-bounce-detail { position: relative; border-left: 3px solid #5eaa9c; background: linear-gradient(115deg, rgba(226,241,229,.85), rgba(255,252,240,.72)); box-shadow: inset 0 1px rgba(255,255,255,.7); }
+.bar-bounce-detail::after { content: '✳'; position: absolute; right: 18px; top: 10px; color: #d6bd88; font: 19px Georgia, serif; }
+@media (max-width: 700px) {
+  .bar-story-profile { height: min(650px, calc(100dvh - 18px)); }
+  .bar-profile-top { display: contents; }
+  .bar-profile-note { display: none; }
+  .bar-bounce-card::after { bottom: 42px; left: 10px; right: 10px; }
+  .bar-bounce-art b { font-size: 42px; }
+}
+@media (prefers-reduced-motion: reduce) { .profile-lanyard-stage { animation: none; } }
