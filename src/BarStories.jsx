@@ -144,6 +144,12 @@ export default function BarStories({ panel, onClose }) {
   const [activeNote, setActiveNote] = useState(0)
 
   useEffect(() => {
+    if (panel !== 'about') return undefined
+    const timer = window.setTimeout(() => setFolderOpen(true), 180)
+    return () => window.clearTimeout(timer)
+  }, [panel])
+
+  useEffect(() => {
     const closeOnEscape = event => { if (event.key === 'Escape') onClose() }
     window.addEventListener('keydown', closeOnEscape)
     return () => window.removeEventListener('keydown', closeOnEscape)
@@ -187,7 +193,7 @@ export default function BarStories({ panel, onClose }) {
                   onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)}
                   onClick={() => setActive(index)}>
                   <span className="bar-bounce-no">{item.number} / 04 <em>{item.color}</em></span>
-                  <span className="bar-bounce-art" aria-hidden="true"><i /><i /><i /><b>✳</b></span>
+                  <span className="bar-bounce-art" aria-hidden="true"><i /><i /><i /></span>
                   <span className="bar-bounce-copy"><small>{item.English}</small><strong>{item.title}</strong></span>
                 </button>
               ))}
@@ -219,7 +225,7 @@ export default function BarStories({ panel, onClose }) {
             <p className="bar-story-eyebrow">ABOUT ME / 自我评价</p>
             <h2>Thoughtful ideas.<br /><em>Thoughtful execution.</em></h2>
             <div className="bar-about-content">
-              <div className={`bar-folder ${folderOpen ? 'is-open' : ''}`} onMouseEnter={() => setFolderOpen(true)} onMouseLeave={() => setFolderOpen(false)}>
+              <div className={`bar-folder ${folderOpen ? 'is-open' : ''}`} onMouseEnter={() => setFolderOpen(true)}>
                 <div className="bar-folder-pages">
                   {aboutNotes.map((note, index) => <button type="button" key={note.label}
                     className={`bar-folder-page ${activeNote === index ? 'is-selected' : ''}`}
@@ -231,7 +237,7 @@ export default function BarStories({ panel, onClose }) {
                 </div>
                 <button type="button" className="bar-folder-cover" aria-expanded={folderOpen}
                   aria-label={folderOpen ? '合上自我评价文件夹' : '打开自我评价文件夹'}
-                  onClick={event => setFolderOpen(value => event.nativeEvent.pointerType === 'mouse' ? true : !value)}>
+                  onClick={() => setFolderOpen(value => !value)}>
                   <span className="bar-folder-tab">PROFILE / 04</span>
                   <span className="bar-folder-mark" aria-hidden="true">W·ZH</span>
                   <span className="bar-folder-caption">FIELD NOTES <i>✦</i> COAST & STARS</span>

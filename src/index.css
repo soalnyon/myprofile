@@ -1112,3 +1112,51 @@ button:hover {
   .bar-bounce-art b { font-size: 42px; }
 }
 @media (prefers-reduced-motion: reduce) { .profile-lanyard-stage { animation: none; } }
+
+/* A rubbery active segment keeps navigation anchored to the scene. */
+.site-navigation { position: absolute; bottom: 40px; left: 50%; display: flex; align-items: center; gap: 10px; transform: translateX(-50%); pointer-events: auto; }
+.nav-items { position: relative; isolation: isolate; display: flex; padding: 5px 7px; border: 1px solid rgba(255,255,255,.36); border-radius: 999px; background: rgba(31,55,62,.76); box-shadow: 0 8px 30px rgba(19,48,54,.19), inset 0 1px rgba(255,255,255,.16); backdrop-filter: blur(15px); }
+.nav-rubber-thumb { position: absolute; z-index: -1; top: 5px; bottom: 5px; border-radius: 999px; background: linear-gradient(145deg, #fceac3, #b9dce1); box-shadow: 0 2px 10px rgba(0,0,0,.18), inset 0 1px rgba(255,255,255,.75); pointer-events: none; }
+.nav-items button { position: relative; z-index: 1; min-width: 62px; padding: 9px 13px; border: 0; border-radius: 999px; color: #e0e8e6; background: transparent; font: 13px Arial, sans-serif; cursor: pointer; transition: color .2s, transform .25s; }
+.nav-items button:hover { color: #fff; transform: translateY(-2px); }
+.nav-items button.is-active { color: #274f58; font-weight: 700; }
+.nav-items button:focus-visible, .nav-toggle:focus-visible { outline: 2px solid #f8d889; outline-offset: 2px; }
+.nav-toggle { flex: none; display: grid; place-items: center; width: 39px; height: 39px; padding: 0; border: 1px solid rgba(255,255,255,.35); border-radius: 50%; color: #fff; background: rgba(31,55,62,.76); box-shadow: 0 5px 19px rgba(19,48,54,.18); backdrop-filter: blur(12px); cursor: pointer; transition: transform .35s, background .35s; }
+.nav-toggle:hover { transform: rotate(90deg); background: #426f75; }
+
+/* Pale beach-sun and sky-blue cards, with drawn details rather than emoji. */
+.bar-story-highlights { background: radial-gradient(circle at 88% 14%, rgba(190,222,231,.55), transparent 35%), linear-gradient(145deg, #fff9e9, #f2f5ee); }
+.bar-bounce-card:nth-child(odd), .bar-bounce-card:nth-child(odd):not(.is-active) { color: #665538; background: linear-gradient(155deg, #fff9df, #f6e6b2); border-color: #e5cf98; }
+.bar-bounce-card:nth-child(even), .bar-bounce-card:nth-child(even):not(.is-active) { color: #355c70; background: linear-gradient(155deg, #effaff, #c9e4ef); border-color: #a9ccd9; }
+.bar-bounce-card.is-active:nth-child(odd) { background: radial-gradient(circle at 78% 25%, #fffdf0, transparent 42%), linear-gradient(145deg, #fff4c6, #f4d690); border-color: #d9b96e; }
+.bar-bounce-card.is-active:nth-child(even) { background: radial-gradient(circle at 78% 25%, #fff, transparent 42%), linear-gradient(145deg, #e8f8ff, #a9d3e7); border-color: #8abbd0; }
+.bar-bounce-art i { border-color: rgba(113,146,151,.25); }
+.bar-bounce-art::after { content: ''; position: absolute; top: 34%; left: 40%; width: 45px; height: 45px; border: 2px solid rgba(235,183,93,.42); border-radius: 50%; box-shadow: 0 0 0 9px rgba(255,255,255,.12); }
+.bar-bounce-card:nth-child(even) .bar-bounce-art::after { border-color: rgba(86,153,184,.4); }
+.bar-bounce-no, .bar-bounce-no em { color: #957f54; }
+.bar-bounce-card:nth-child(even) .bar-bounce-no, .bar-bounce-card:nth-child(even) .bar-bounce-no em { color: #5c8ba2; }
+.bar-bounce-copy small, .bar-bounce-card.is-active .bar-bounce-copy small { color: #8d7b58; }
+.bar-bounce-card:nth-child(even) .bar-bounce-copy small { color: #648da3; }
+.bar-bounce-detail { border-color: #dfd7b9; border-left-color: #d8ad64; color: #4a6170; background: linear-gradient(115deg, #fff8e4, #edf6f7); }
+.bar-bounce-detail::after { content: ''; top: 13px; width: 18px; height: 18px; border: 1px solid #d7b778; border-radius: 50%; background: #f9eac5; }
+.bar-bounce-card::after { background: linear-gradient(90deg, #d4ad68, transparent); }
+.bar-bounce-card:nth-child(even)::after { background: linear-gradient(90deg, #8dbacd, transparent); }
+
+/* Let the fourth drink unfold on arrival, with a slower sequence of notes. */
+.bar-folder-page { transition-duration: 1.05s; transition-delay: calc(var(--page-index) * 130ms); }
+.bar-folder-cover { transition-duration: 1.15s; }
+.bar-folder.is-open .bar-folder-page:nth-child(1) { transform: translate(calc(-50% - 82px),-4px) rotate(-13deg); }
+.bar-folder.is-open .bar-folder-page:nth-child(2) { transform: translate(-50%,-31px) rotate(0deg); }
+.bar-folder.is-open .bar-folder-page:nth-child(3) { transform: translate(calc(-50% + 82px),-4px) rotate(13deg); }
+@media (max-width: 700px) {
+  .bar-story-highlights { height: min(650px, calc(100dvh - 18px)); }
+  .site-navigation { bottom: 18px; gap: 5px; width: calc(100vw - 20px); justify-content: center; }
+  .nav-items { max-width: calc(100vw - 58px); padding: 4px 5px !important; }
+  .nav-items button { min-width: 0; padding: 8px 7px !important; font-size: 10px !important; }
+  .nav-rubber-thumb { top: 4px; bottom: 4px; }
+  .nav-toggle { width: 33px; height: 33px; }
+  .bar-bounce-art::after { top: 28%; left: 42%; width: 23px; height: 23px; border-width: 1px; }
+  .bar-folder.is-open .bar-folder-page:nth-child(1) { transform: translate(calc(-50% - 62px),-2px) rotate(-12deg); }
+  .bar-folder.is-open .bar-folder-page:nth-child(3) { transform: translate(calc(-50% + 62px),-2px) rotate(12deg); }
+}
+@media (prefers-reduced-motion: reduce) { .bar-folder-page, .bar-folder-cover, .nav-items button, .nav-toggle { transition: none; } }

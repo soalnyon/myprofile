@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, Suspense, useRef, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { CameraControls, Environment, Lightformer, Sparkles, useProgress } from '@react-three/drei';
 import { EffectComposer, HueSaturation, Bloom } from '@react-three/postprocessing';
@@ -223,6 +223,10 @@ const [isDay, setIsDay] = useState(true);
   // 新增：当前视角状态与导航栏展开状态
   const [currentView, setCurrentView] = useState('overview');
   const [navExpanded, setNavExpanded] = useState(true);
+  const navTrackRef = useRef(null);
+  const navThumbRef = useRef(null);
+  const previousNavPosition = useRef(null);
+  const [navThumb, setNavThumb] = useState({ left: 0, width: 0 });
 
   // 导航栏配置
   const navItems = [
@@ -233,6 +237,35 @@ const [isDay, setIsDay] = useState(true);
     { label: 'Beach', key: 'beach' },
     { label: 'Palm', key: 'greenery' }
   ];
+
+  useLayoutEffect(() => {
+    if (!navExpanded || !navTrackRef.current) return undefined;
+    const updateThumb = () => {
+      const selected = navTrackRef.current?.querySelector(`[data-nav-key="${currentView}"]`);
+      if (!selected) return;
+      const next = { left: selected.offsetLeft, width: selected.offsetWidth };
+      const previous = previousNavPosition.current;
+      setNavThumb(next);
+      if (previous && previous.key !== currentView && navThumbRef.current && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const from = previous.metrics;
+        const left = Math.min(from.left, next.left);
+        const right = Math.max(from.left + from.width, next.left + next.width);
+        const direction = Math.sign(next.left - from.left);
+        navThumbRef.current.getAnimations().forEach(animation => animation.cancel());
+        navThumbRef.current.animate([
+          { left: `${from.left}px`, width: `${from.width}px`, offset: 0 },
+          { left: `${left}px`, width: `${right - left}px`, offset: .48 },
+          { left: `${next.left - direction * 4}px`, width: `${next.width + 4}px`, offset: .82 },
+          { left: `${next.left}px`, width: `${next.width}px`, offset: 1 },
+        ], { duration: 570, easing: 'cubic-bezier(.22,.8,.22,1)' });
+      }
+      previousNavPosition.current = { key: currentView, metrics: next };
+    };
+    updateThumb();
+    const observer = new ResizeObserver(updateThumb);
+    observer.observe(navTrackRef.current);
+    return () => observer.disconnect();
+  }, [currentView, navExpanded]);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -315,39 +348,17 @@ const [isDay, setIsDay] = useState(true);
         {/* ========================================== */}
         {/* 新增：可收起的底部胶囊导航栏 */}
         {/* ========================================== */}
-        <div className="site-navigation" style={{
-          position: 'absolute',
-          bottom: '40px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          pointerEvents: 'auto'
-        }}>
+        <div className="site-navigation">
           {navExpanded && (
-            <div className="nav-items" style={{
-              display: 'flex',
-              background: 'rgba(25, 25, 30, 0.65)',
-              backdropFilter: 'blur(10px)',
-              padding: '6px 8px',
-              borderRadius: '40px',
-              border: '1px solid rgba(255,255,255,0.1)'
-            }}>
+            <div className="nav-items" ref={navTrackRef} role="group" aria-label="场景导航">
+              <span className="nav-rubber-thumb" ref={navThumbRef} style={{ left: navThumb.left, width: navThumb.width }} aria-hidden="true" />
               {navItems.map(item => (
                 <button 
                   key={item.key}
+                  data-nav-key={item.key}
+                  className={currentView === item.key ? 'is-active' : ''}
+                  aria-current={currentView === item.key ? 'page' : undefined}
                   onClick={() => setCurrentView(item.key)}
-                  style={{
-                    background: currentView === item.key ? 'rgba(255,255,255,0.2)' : 'transparent',
-                    color: currentView === item.key ? '#fff' : '#a0a0a0',
-                    border: 'none',
-                    padding: '8px 16px',
-                    borderRadius: '30px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    transition: 'all 0.3s ease'
-                  }}
                 >
                   {item.key === 'overview' && '◇ '}
                   {item.label}
@@ -357,21 +368,11 @@ const [isDay, setIsDay] = useState(true);
           )}
           
           <button 
+            className="nav-toggle"
+            type="button"
+            aria-label={navExpanded ? '收起导航' : '展开导航'}
+            aria-expanded={navExpanded}
             onClick={() => setNavExpanded(!navExpanded)}
-            style={{
-              background: 'rgba(25, 25, 30, 0.65)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: '#fff',
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              transition: 'all 0.3s'
-            }}
           >
             {navExpanded ? '✕' : '◇'}
           </button>

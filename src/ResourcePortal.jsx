@@ -100,7 +100,7 @@ export default function ResourcePortal({ onClose }) {
       </div>
       <p>A SMALL COLLECTION FROM THE COAST <span>✦</span> GROWING WITH TIME</p>
     </footer>
-    <a className="resource-cv-float" href="/cv22.pdf" target="_blank" rel="noopener noreferrer" aria-label="查看完整简历 PDF" title="查看完整简历">
+    <a className="resource-cv-float" href="/cv22.pdf" download="王子涵_完整简历.pdf" aria-label="下载完整简历 PDF" title="下载完整简历">
       <FaFilePdf aria-hidden="true" /><span>查看完整简历</span>
     </a>
   </section>
