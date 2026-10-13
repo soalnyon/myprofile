@@ -194,8 +194,9 @@ const [isDay, setIsDay] = useState(true);
 
   useEffect(() => {
     if (!modelReady || transition?.type !== 'load') return;
-    const done = window.setTimeout(() => setTransition(null), 480);
-    return () => window.clearTimeout(done);
+    const reveal = window.setTimeout(() => setTransition(previous => previous?.type === 'load' ? { ...previous, complete: true } : previous), 320);
+    const done = window.setTimeout(() => setTransition(null), 1320);
+    return () => { window.clearTimeout(reveal); window.clearTimeout(done); };
   }, [modelReady, transition?.type]);
 
   useEffect(() => {
@@ -204,14 +205,14 @@ const [isDay, setIsDay] = useState(true);
     let switched = false;
     const start = performance.now();
     const tick = (now) => {
-      const progress = Math.min(100, Math.round((now - start) / 950 * 100));
+      const progress = Math.min(100, Math.round((now - start) / 1300 * 100));
       if (progress >= 48 && !switched) {
         switched = true;
         setIsDay(value => !value);
       }
       setTransition(previous => ({ ...previous, progress }));
       if (progress < 100) frame = requestAnimationFrame(tick);
-      else frame = window.setTimeout(() => setTransition(null), 260);
+      else frame = window.setTimeout(() => setTransition(null), 300);
     };
     frame = requestAnimationFrame(tick);
     return () => {
@@ -402,13 +403,18 @@ const [isDay, setIsDay] = useState(true);
       {showResources && <ResourcePortal onClose={() => setShowResources(false)} />}
       <ClickSpark spark={spark} onEnd={() => setSpark(null)} />
       {transition && (
-        <div className={`scene-transition ${transition.type === 'theme' ? `scene-transition-${transition.target}` : 'scene-transition-day'}`}
+        <div className={`scene-transition ${transition.type === 'theme' ? `scene-transition-theme scene-transition-${transition.target}` : 'scene-transition-day'} ${transition.complete ? 'scene-transition-complete' : ''} ${transition.type === 'theme' && transition.progress >= 83 ? 'scene-transition-finishing' : ''}`}
           role="status" aria-label={transition.type === 'load' ? 'Loading coastal scene' : 'Changing time of day'}>
+          {transition.type === 'load' && <div className="transition-pixels" aria-hidden="true">
+            {Array.from({ length: 96 }, (_, index) => <span key={index} className="transition-pixel"
+              style={{ '--pixel-delay': `${((index * 37) % 13) * 11}ms` }} />)}
+          </div>}
           <div className="transition-mark" aria-hidden="true">✦</div>
           <p className="transition-eyebrow">COAST & STARS</p>
           <h2>{transition.type === 'load' ? 'Ready to explore ?' : transition.target === 'night' ? 'When the sun sets' : 'When morning returns'}</h2>
           <div className="transition-rule" aria-hidden="true" />
           <p className="transition-caption">{transition.type === 'load' ? '欢迎参观' : 'Changing the light'}</p>
+          <div className="transition-eyes" aria-hidden="true"><span className="transition-eye"><i /></span><span className="transition-eye"><i /></span></div>
           <div className="transition-progress" role="progressbar"
             aria-valuemin={0} aria-valuemax={100}
             aria-valuenow={transition.type === 'load' ? (modelReady ? 100 : Math.min(95, Math.round(loadProgress))) : transition.progress}>

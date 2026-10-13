@@ -7,22 +7,22 @@ const education = [
 
 const highlights = [
   {
-    number: '01', title: '公众号运营', English: 'EDITORIAL', color: '#D99D7B',
+    number: '01', title: '公众号运营', English: 'EDITORIAL', color: '#79A078',
     summary: '把活动与品牌故事写成值得阅读的内容。',
     details: ['撰写活动推广、活动总结与节日类推文。', '独立策划内容逻辑和活动文案，提升用户黏性。'],
   },
   {
-    number: '02', title: '线下活动支持', English: 'IN PERSON', color: '#D6B476',
+    number: '02', title: '线下活动支持', English: 'IN PERSON', color: '#94AA7E',
     summary: '让每一次见面都有清晰、统一的表达。',
     details: ['支持校园开放日、主题讲座、咨询答疑会和展会的全流程执行。', '制作项目宣讲 PPT 与活动物料，参与线下活动 20 余场。'],
   },
   {
-    number: '03', title: '线上项目推广', English: 'DIGITAL', color: '#82AFC0',
+    number: '03', title: '线上项目推广', English: 'DIGITAL', color: '#70A092',
     summary: '从用户洞察出发，持续优化推广。',
     details: ['分析招生数据，形成学生画像。', '推广短信覆盖 6 万余用户，跟进广告投放并优化物料与投放机制。'],
   },
   {
-    number: '04', title: '内容策划', English: 'STORYTELLING', color: '#A6A98A',
+    number: '04', title: '内容策划', English: 'STORYTELLING', color: '#A4B58A',
     summary: '用内容连接活动、渠道与人。',
     details: ['策划年度内容主题、活动文案和广告文案。', '制作招生邮件模板等标准化材料，搭建内容模板与执行流程。'],
   },
