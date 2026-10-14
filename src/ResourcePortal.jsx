@@ -13,6 +13,7 @@ const sections = [
       { name: '扣子空间', url: 'https://space.coze.cn/', icon: FaWandMagicSparkles },
       { name: 'Poe', url: 'https://poe.com/', icon: SiPoe },
       { name: 'Perplexity', url: 'https://www.perplexity.ai/', icon: SiPerplexity },
+      { name: 'Usecases', url: 'https://agentusecases.ai/', icon: FaLightbulb },
       { name: '秘塔搜索', url: 'https://metaso.cn/?s=wetaba', icon: FaBrain },
     ],
   },
