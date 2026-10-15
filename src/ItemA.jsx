@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useMemo, useState, useCallback } from 'react'
 import { useGLTF, Html } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { Box3, Vector3 } from 'three'
@@ -8,6 +8,28 @@ const MODEL_URL = '/midnight_coast_v3.glb'
 const noRaycast = () => {}
 const DRINK_NAMES = new Set(['Drink_Citrus', 'Drink_Coconut', 'Drink_Mint', 'Drink_Pink'])
 const DRINK_BY_PANEL = { profile: 'Drink_Coconut', highlights: 'Drink_Pink', posters: 'Drink_Mint', about: 'Drink_Citrus' }
+
+function AssemblyPiece({ node, index, register, children }) {
+  const group = useRef()
+
+  useLayoutEffect(() => {
+    const angle = index * 2.399963229728653
+    const radius = 2.1 + ((index * 17) % 9) * .37
+    const offset = [Math.cos(angle) * radius, 1.1 + ((index * 11) % 10) * .28, Math.sin(angle) * radius * .78]
+    const turn = [Math.sin(angle) * .15, Math.cos(angle) * .42, Math.sin(angle * 1.7) * .2]
+    const foundation = /^(DisplayPlinth|BeachSand|WaterSurface|WaterVolume)/.test(node.name)
+    const structure = /^(Building|ExteriorStaircase|PalmTrunk|Pier|CoastalShelter)/.test(node.name)
+    const delay = foundation ? (index % 4) * .1 : structure ? .32 + (index % 5) * .12 : .72 + ((index * 7) % 19) * .075
+    const part = group.current
+    part.position.set(...offset)
+    part.rotation.set(...turn)
+    part.scale.setScalar(.78)
+    register(index, { part, offset, turn, delay, duration: 1.8 + (index % 5) * .12 })
+    return () => register(index, null)
+  }, [index, node.name, register])
+
+  return <group ref={group}>{children}</group>
+}
 
 function InteractionHint({ label, onClick, subtle = false, position = [0, 0.18, 0] }) {
   return (
@@ -267,13 +289,13 @@ function interactionFor(name) {
 // transforms survive future model revisions without hard-coded coordinates.
 function ModelNode({ node, currentView, onInteract, isDay, lampMaterial,
   onBoatAction, boatToken, onCoconutAction, coconutToken, coconutRunning,
-  onWaterRipple, waterRipple, featureMotion, postcardMotion,
+  onWaterRipple, waterRipple, featureMotion, postcardMotion, registerAssemblyPiece,
   inheritedInteraction = null, inheritedWater = null }) {
   // Keep lighting owned by App's existing day/night setup.
   if (node.isLight || node.isCamera) return null
 
   const interactionProps = { isDay, lampMaterial, onBoatAction, boatToken,
-    onCoconutAction, coconutToken, coconutRunning, onWaterRipple, waterRipple, featureMotion, postcardMotion }
+    onCoconutAction, coconutToken, coconutRunning, onWaterRipple, waterRipple, featureMotion, postcardMotion, registerAssemblyPiece }
   if (node.name === 'BoatMotionRoot') {
     return <BoatMotion node={node} currentView={currentView} onInteract={onInteract}
       {...interactionProps} />
@@ -336,11 +358,14 @@ function ModelNode({ node, currentView, onInteract, isDay, lampMaterial,
       {node.isMesh && water === 'volume' && (
         <meshStandardMaterial color="#368c89" transparent opacity={0.18} depthWrite={false} roughness={0.8} />
       )}
-      {node.children.map(child => (
-        <ModelNode key={child.uuid} node={child} currentView={currentView}
+      {node.children.map((child, index) => {
+        const content = <ModelNode node={child} currentView={currentView}
           onInteract={onInteract} {...interactionProps}
           inheritedInteraction={interaction} inheritedWater={water} />
-      ))}
+        return node.name === 'SceneRoot' ? (
+          <AssemblyPiece key={child.uuid} node={child} index={index} register={registerAssemblyPiece}>{content}</AssemblyPiece>
+        ) : <React.Fragment key={child.uuid}>{content}</React.Fragment>
+      })}
       {node.name === 'Boat' && currentView === 'boat' && (
         <InteractionHint label="Set the boat adrift" position={[0, -0.58, 0]} onClick={onBoatAction} />
       )}
@@ -355,7 +380,7 @@ function ModelNode({ node, currentView, onInteract, isDay, lampMaterial,
   )
 }
 
-export function Model({ currentView, setCurrentView, setShowPostcard, setShowStars, setShowJourney, setShowResources, setDrinkPanel, isDay, onReady, onInteractionSound, ...props }) {
+export function Model({ currentView, setCurrentView, setShowPostcard, setShowStars, setShowJourney, setShowResources, setDrinkPanel, isDay, assemblyStarted, onReady, onInteractionSound, ...props }) {
   const { scene } = useGLTF(MODEL_URL)
   const group = useRef()
   const [boatToken, setBoatToken] = useState(0)
@@ -367,6 +392,10 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
   const journeyTimer = useRef(null)
   const resourcesTimer = useRef(null)
   const featureTimer = useRef(null)
+  const assemblyPieces = useRef([])
+  const assemblyStart = useRef(null)
+  const assemblyComplete = useRef(false)
+  const registerAssemblyPiece = useCallback((index, piece) => { assemblyPieces.current[index] = piece }, [])
   const center = useMemo(() => {
     const localCenter = new Box3().setFromObject(scene).getCenter(new Vector3())
     return localCenter.multiplyScalar(props.scale ?? 1).add(new Vector3(...props.position)).toArray()
@@ -391,6 +420,20 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
   useFrame(({ clock }) => {
     if (!group.current) return
     group.current.position.y = -2 + Math.sin(clock.elapsedTime * 0.85) * 0.045
+    if (!assemblyStarted || assemblyComplete.current) return
+    if (assemblyStart.current === null) assemblyStart.current = clock.elapsedTime
+    const elapsed = clock.elapsedTime - assemblyStart.current
+    let allSettled = true
+    assemblyPieces.current.forEach(piece => {
+      if (!piece) return
+      const t = Math.min(1, Math.max(0, (elapsed - piece.delay) / piece.duration))
+      const remaining = 1 - t * t * (3 - 2 * t)
+      piece.part.position.set(piece.offset[0] * remaining, piece.offset[1] * remaining, piece.offset[2] * remaining)
+      piece.part.rotation.set(piece.turn[0] * remaining, piece.turn[1] * remaining, piece.turn[2] * remaining)
+      piece.part.scale.setScalar(1 - .22 * remaining)
+      if (t < 1) allSettled = false
+    })
+    if (allSettled) assemblyComplete.current = true
   })
 
   const handleInteraction = (interaction) => {
@@ -418,6 +461,7 @@ export function Model({ currentView, setCurrentView, setShowPostcard, setShowSta
   return (
     <group ref={group} {...props} dispose={null}>
       <ModelNode node={scene} currentView={currentView} onInteract={handleInteraction}
+        registerAssemblyPiece={registerAssemblyPiece}
         isDay={isDay} lampMaterial={lampMaterial} featureMotion={featureMotion} postcardMotion={postcardMotion}
         onBoatAction={() => {
           onInteractionSound?.()

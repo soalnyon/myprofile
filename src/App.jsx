@@ -182,8 +182,12 @@ const resetPostcard = event => {
   event.currentTarget.style.setProperty('--tilt-y', '0deg');
   event.currentTarget.style.setProperty('--tilt-x', '0deg');
 };
-const [isDay, setIsDay] = useState(true);
+const [isDay, setIsDay] = useState(() => {
+  const hour = new Date().getHours();
+  return hour >= 6 && hour < 20;
+});
   const [modelReady, setModelReady] = useState(false);
+  const [assemblyStarted, setAssemblyStarted] = useState(false);
   const [modelCenter, setModelCenter] = useState([2, -0.25, 0]);
   const [transition, setTransition] = useState({ type: 'load', progress: 0 });
   const loadProgress = useProgress(state => state.progress);
@@ -195,7 +199,10 @@ const [isDay, setIsDay] = useState(true);
   useEffect(() => {
     if (!modelReady || transition?.type !== 'load') return;
     const reveal = window.setTimeout(() => setTransition(previous => previous?.type === 'load' ? { ...previous, complete: true } : previous), 320);
-    const done = window.setTimeout(() => setTransition(null), 1320);
+    const done = window.setTimeout(() => {
+      setAssemblyStarted(true);
+      setTransition(null);
+    }, 1320);
     return () => { window.clearTimeout(reveal); window.clearTimeout(done); };
   }, [modelReady, transition?.type]);
 
@@ -299,6 +306,7 @@ const [isDay, setIsDay] = useState(true);
               setShowResources={setShowResources}
               setDrinkPanel={setDrinkPanel}
               isDay={isDay}
+              assemblyStarted={assemblyStarted}
               onReady={handleModelReady}
               onInteractionSound={playInteractionSound}
             />
@@ -403,7 +411,7 @@ const [isDay, setIsDay] = useState(true);
       {showResources && <ResourcePortal onClose={() => setShowResources(false)} />}
       <ClickSpark spark={spark} onEnd={() => setSpark(null)} />
       {transition && (
-        <div className={`scene-transition ${transition.type === 'theme' ? `scene-transition-theme scene-transition-${transition.target}` : 'scene-transition-day'} ${transition.complete ? 'scene-transition-complete' : ''} ${transition.type === 'theme' && transition.progress >= 83 ? 'scene-transition-finishing' : ''}`}
+        <div className={`scene-transition ${transition.type === 'theme' ? `scene-transition-theme scene-transition-${transition.target}` : `scene-transition-${isDay ? 'day' : 'night'}`} ${transition.complete ? 'scene-transition-complete' : ''} ${transition.type === 'theme' && transition.progress >= 83 ? 'scene-transition-finishing' : ''}`}
           role="status" aria-label={transition.type === 'load' ? 'Loading coastal scene' : 'Changing time of day'}>
           {transition.type === 'load' && <div className="transition-pixels" aria-hidden="true">
             {Array.from({ length: 96 }, (_, index) => <span key={index} className="transition-pixel"

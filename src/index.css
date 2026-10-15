@@ -1200,6 +1200,7 @@ button:hover {
 .scene-transition-theme.scene-transition-finishing { animation: scene-transition-out .3s ease-in both; }
 .transition-pixels { position: absolute; inset: 0; z-index: 0; display: grid; grid-template-columns: repeat(12, 1fr); grid-template-rows: repeat(8, 1fr); pointer-events: none; }
 .transition-pixel { background: #dce9df; }
+.scene-transition-night .transition-pixel { background: #142d40; }
 .scene-transition-complete { background: transparent; }
 .scene-transition-complete .transition-pixel { animation: scene-pixel-out .72s ease-in var(--pixel-delay) both; }
 .scene-transition > :not(.transition-pixels):not(.transition-wave) { position: relative; z-index: 1; }
